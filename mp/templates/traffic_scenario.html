@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>교통량 분석</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/traffic_scenario.css') }}"
+    />
+  </head>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script defer>
+    let trafficChart = null;
+
+    async function drawChart() {
+      const start = document.getElementById("start").value;
+      const end = document.getElementById("end").value;
+
+      if (!start || !end) {
+        alert("날짜를 선택해주세요.");
+        return;
+      }
+
+      const res = await fetch("/traffic_scenario/chart-data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          start_date: start + " 00:00:00",
+          end_date: end + " 23:59:59",
+        }),
+      });
+
+      if (!res.ok) {
+        alert("서버에서 데이터를 가져오지 못했습니다.");
+        return;
+      }
+
+      const data = await res.json();
+      console.log("📊 chart data:", data);
+
+      const ctx = document.getElementById("trafficChart").getContext("2d");
+      if (trafficChart) trafficChart.destroy();
+
+      // 중요도별 스타일
+      const styleMap = {
+        전체: { color: "#111827", width: 3, hidden: false },
+        출근: { color: "#2563eb", width: 3, hidden: false },
+        퇴근: { color: "#dc2626", width: 3, hidden: false },
+
+        오전: { color: "#93c5fd", width: 1, hidden: true },
+        점심: { color: "#fde68a", width: 1, hidden: true },
+        오후: { color: "#6ee7b7", width: 1, hidden: true },
+        야간: { color: "#9ca3af", width: 1, hidden: true },
+      };
+
+      const datasets = [];
+
+      for (const [label, values] of Object.entries(data.datasets)) {
+        const style = styleMap[label] || {};
+
+        datasets.push({
+          label: label,
+          data: values,
+          borderColor: style.color || "#999",
+          borderWidth: style.width || 1,
+          hidden: style.hidden ?? true,
+          tension: 0.35,
+          spanGaps: true,
+        });
+      }
+
+      trafficChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: data.labels,
+          datasets: datasets,
+        },
+        options: {
+          responsive: true,
+          interaction: {
+            mode: "index",
+            intersect: false,
+          },
+          plugins: {
+            legend: {
+              position: "top",
+              labels: {
+                usePointStyle: true,
+              },
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => `${ctx.dataset.label} : ${ctx.parsed.y}`,
+              },
+            },
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              title: {
+                display: true,
+                text: "교통량",
+              },
+            },
+            x: {
+              ticks: {
+                maxTicksLimit: 12,
+              },
+              title: {
+                display: true,
+                text: "시간",
+              },
+            },
+          },
+        },
+      });
+    }
+  </script>
+  {% extends "layout.html" %} {% block content %}
+  <body>
+    <div class="container_traffic">
+      <h1>교통량 분석</h1>
+      <div class="control-panel">
+        <label>시작 날짜</label>
+        <input type="date" id="start" />
+        <label>종료 날짜</label>
+        <input type="date" id="end" />
+        <button onclick="drawChart()">그래프 생성</button>
+      </div>
+      <div class="chart-wrapper">
+        <canvas id="trafficChart"></canvas>
+      </div>
+    </div>
+  </body>
+  {% endblock %}
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main_bass.css') }}"
+    />
+    <style>
+      .massage {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        height: 80vh;
+      }
+    </style>
+    <title>메시지</title>
+  </head>
+  <body>
+    {% extends "layout.html" %} {% block content %}
+    <div class="massage">
+      <h1>메시지</h1>
+      <p>메시지 기능은 추가 예정입니다.</p>
+    </div>
+    {% if login_required_alert %}
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        alert("로그인 후 이용 부탁드립니다.");
+
+        // 로그인 모달 열기
+        const loginModal = document.getElementById("login-modal");
+        const modalBg = document.getElementById("modal-bg");
+
+        if (loginModal && modalBg) {
+          loginModal.classList.add("show");
+          modalBg.classList.add("show");
+        }
+      });
+    </script>
+    {% endif %} {% endblock %}
+  </body>
+</html>

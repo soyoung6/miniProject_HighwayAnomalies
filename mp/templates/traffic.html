@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경부선 실시간 교통량 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f4f7f6;
+        }
+        
+        .main-layout {
+            display: flex;
+            gap: 16px;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .video-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .video-box {
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            flex: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .video-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        /* 토글 모달 스타일 */
+        .map_toggleBtn {
+            position: fixed;
+            right: 20px;
+            top: 20px;
+            z-index: 1000;
+            width: 300px;
+        }
+        
+        .map_toggleBtn .content {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            margin-bottom: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .map_toggleBtn .content ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .map_toggleBtn .content li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .map_toggleBtn .content li:last-child {
+            border-bottom: none;
+        }
+        
+        .map_toggleBtn .content li:hover {
+            color: #2563eb;
+            padding-left: 8px;
+        }
+        
+        .toggle_button {
+            display: block;
+            width: 100%;
+            padding: 12px 16px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .toggle_button:hover {
+            background-color: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+        
+        .toggle_button:active {
+            transform: translateY(0);
+        }
+        
+        /* 제어판 스타일 */
+        .control-panel {
+            background-color: white;
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+        
+        .control-panel form {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .control-panel label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+        }
+        
+        .control-panel select {
+            flex: 1;
+            min-width: 200px;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            focus:ring-2;
+            focus:ring-blue-500;
+            cursor: pointer;
+        }
+        
+        .control-panel button {
+            padding: 8px 16px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .control-panel button:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 12px;
+        }
+        
+        .status-info {
+            color: #1f2937;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 18px;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 1024px) {
+            .main-layout {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .map_toggleBtn {
+                position: static;
+                width: 100%;
+                margin-top: 20px;
+            }
+            
+            .map_toggleBtn .content {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .video-section {
+                padding: 12px;
+            }
+            
+            .map_toggleBtn {
+                width: 100%;
+            }
+            
+            .toggle_button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <!-- 비디오 섹션 -->
+        <div class="video-section">
+            <h1 class="text-3xl font-bold text-gray-800 mb-4 border-b pb-2">🛣️ 경부선 실시간 CCTV 교통 분석</h1>
+            
+            <!-- 제어 패널 -->
+            <div class="control-panel">
+                <form method="POST" action="{{ url_for('traffic.index') }}">
+                    <label for="cctv_select">CCTV 선택:</label>
+                    <select id="cctv_select" name="cctv_name">
+                        {% for name in cctv_names %}
+                            <option value="{{ name }}" {% if name == target_name %}selected{% endif %}>
+                                {{ name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit">분석 시작</button>
+                </form>
+                
+                {% if target_name %}
+                    <div class="status-info">현재 분석: {{ target_name }}</div>
+                    <p class="info-text">* 화면 좌측 상단의 "방향 1/2"는 영상의 흐름 방향에 따른 교통 상태를 표시합니다.</p>
+                {% endif %}
+            </div>
+            
+            <!-- 비디오 스트림 -->
+            {% if target_name and target_url %}
+                <div class="video-box">
+                    <img src="{{ url_for('traffic.video_feed', cctv_url=target_url | urlencode) }}" 
+                         alt="실시간 교통량 분석 스트림" 
+                         onerror="this.onerror=null; this.src='https://placehold.co/1280x720/E5E7EB/4B5563?text=스트림+로딩+중+또는+연결+실패';"
+                    >
+                </div>
+            {% else %}
+                <div class="video-box flex items-center justify-center bg-gray-200">
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg">
+                        <p class="font-bold">CCTV 데이터를 찾을 수 없습니다.</p>
+                        <p class="text-sm">API 연결 상태를 확인하거나, CCTV 목록을 먼저 선택해주세요.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- 토글 모달 (고정 위치) -->
+    <div class="map_toggleBtn">
+        <div class="content">
+            <h3 style="margin-bottom: 12px; font-weight: 700; color: #1f2937;">빠른 정보</h3>
+            <ul>
+                <li>📊 교통량 분석 중</li>
+                <li>🚗 차량 감지 시스템</li>
+                <li>⚡ 실시간 스트리밍</li>
+                <li>📍 경부고속도로</li>
+                <li>🎯 광학 흐름 기반 분석</li>
+            </ul>
+        </div>
+        <button class="toggle_button">정보 보기</button>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            const $content = $(".map_toggleBtn .content");
+            const $button = $(".map_toggleBtn .toggle_button");
+            
+            // 초기 상태: 숨김
+            $content.hide();
+            
+            // 버튼 클릭 시 토글
+            $button.on("click", function () {
+                $content.slideToggle(300, function () {
+                    if ($content.is(":visible")) {
+                        $button.text("정보 숨기기");
+                    } else {
+                        $button.text("정보 보기");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

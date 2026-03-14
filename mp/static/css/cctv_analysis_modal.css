@@ -1,0 +1,354 @@
+/* 기존 CSS */
+
+.cctv-widget {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 380px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 0px 4px rgb(0, 0, 0);
+  z-index: 1000;
+  display: none;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.cctv-widget.show {
+  display: block;
+  animation: slideInRight 0.3s ease;
+}
+
+.cctv-widget.collapsed .cctv-widget-body {
+  display: none;
+}
+
+.cctv-widget.collapsed .cctv-toggle-btn svg {
+  transform: rotate(180deg);
+}
+
+.cctv-widget.dragging {
+  cursor: move;
+  opacity: 0.9;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.cctv-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #667eea;
+  cursor: move;
+}
+
+.cctv-widget-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.cctv-widget-title svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cctv-widget-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.cctv-control-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.cctv-control-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.cctv-control-btn svg {
+  transition: transform 0.2s;
+}
+
+.cctv-widget-body {
+  padding: 16px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.cctv-selector-section {
+  margin-bottom: 12px;
+}
+
+.cctv-selector-header {
+  margin-bottom: 10px;
+}
+
+.cctv-weather-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 8px;
+  color: white;
+}
+
+.cctv-weather-info .weather-temp {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cctv-weather-info .weather-status {
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+/* 헤더에 표시되는 날씨 */
+.header-weather {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 500;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.cctv-selector-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.cctv-selector {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #1f2937;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.cctv-selector:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.cctv-widget-start-btn {
+  width: 100%;
+  padding: 10px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.cctv-widget-start-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.cctv-widget-start-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cctv-widget-video-area {
+  animation: fadeIn 0.3s ease;
+}
+
+.cctv-widget-video-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.cctv-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  background: #ef4444;
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 4px;
+  animation: pulse 2s infinite;
+}
+
+.cctv-current-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.cctv-widget-video-wrapper {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid #e5e7eb;
+  margin-bottom: 10px;
+}
+
+.cctv-widget-stream-img {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: zoom-in;
+}
+
+.cctv-widget-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.cctv-widget-stop-btn {
+  flex: 1;
+  padding: 8px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.cctv-widget-stop-btn:hover {
+  background: #dc2626;
+}
+/* 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓 */
+/* 이미지 확대 오버레이 - 새로 추가된 부분 */
+.image-zoom-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: fadeIn 0.2s ease;
+}
+
+.image-zoom-overlay.active {
+  display: flex;
+}
+
+.image-zoom-overlay img {
+  max-width: 95vw;
+  max-height: 95vh;
+  object-fit: contain;
+  border-radius: 8px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  animation: zoomIn 0.3s ease;
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.zoom-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.zoom-close-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .cctv-widget {
+    width: calc(100% - 40px);
+    right: 20px;
+    top: 60px;
+  }
+}
+/* 〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓〓 */
+/* 이미지 확대 오버레이 - 새로 추가된 부분 */

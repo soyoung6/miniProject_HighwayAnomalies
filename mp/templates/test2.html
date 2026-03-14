@@ -1,0 +1,171 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="traffic-predict-container">
+
+    <!-- 새로운 버튼 추가 -->
+    <div class="go-traffic-scenario" style="margin-bottom: 20px;">
+        <a href="{{ url_for('traffic_scenario.scenario_page') }}" class="btn-predict">
+            🚦 교통량 시나리오 페이지로 이동
+        </a>
+    </div>
+
+    <!-- 날짜 선택 -->
+    <div class="form-row">
+        <div class="form-group">
+            <label>시작 날짜</label>
+            <input type="date" id="start">
+        </div>
+        <div class="form-group">
+            <label>종료 날짜</label>
+            <input type="date" id="end">
+        </div>
+    </div>
+    <button class="btn-predict" onclick="runAll()">
+        🚀 분석 실행
+    </button>
+
+    <!-- 결과 영역 -->
+    <div class="results-dashboard active">
+        <div class="table-section">
+            <h3>✅ 가장 덜 막히는 출근 시간</h3>
+            <pre id="best">-</pre>
+        </div>
+        <div class="table-section">
+            <h3>🚨 가장 혼잡한 퇴근 시간</h3>
+            <pre id="worst">-</pre>
+        </div>
+        <div class="table-section">
+            <h3>⚠️ 이상 혼잡 시간</h3>
+            <pre id="anomaly">-</pre>
+        </div>
+    </div>
+
+    <!-- 차트 영역 -->
+    <div class="chart-section" style="margin-top: 40px;">
+        <h3>📈 출퇴근 교통량 그래프</h3>
+        <canvas id="trafficChart" width="800" height="400"></canvas>
+    </div>
+
+</div>
+
+<script>
+function payload() {
+    return {
+        start_date: document.getElementById('start').value + ' 00:00:00',
+        end_date: document.getElementById('end').value + ' 23:00:00'
+    };
+}
+
+// 기존 API 호출
+async function fetchScenario(url, target) {
+    const res = await fetch('/traffic_scenario' + url, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload())
+    });
+
+    if (!res.ok) {
+        document.getElementById(target).textContent = '❌ 서버 오류';
+        return;
+    }
+
+    const data = await res.json();
+    document.getElementById(target).textContent = JSON.stringify(data, null, 2);
+}
+
+// 차트 그리기 전역 객체
+let trafficChart = null;
+
+// 차트 렌더링 함수
+function renderChart(labels, morningData, eveningData) {
+    const ctx = document.getElementById('trafficChart').getContext('2d');
+
+    if (trafficChart) {
+        trafficChart.destroy(); // 기존 차트 제거
+    }
+
+    trafficChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: '출근 시간 교통량',
+                    data: morningData,
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    tension: 0.3
+                },
+                {
+                    label: '퇴근 시간 교통량',
+                    data: eveningData,
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'top' }
+            },
+            scales: {
+                y: { beginAtZero: true },
+                x: { title: { display: true, text: '시간' } }
+            }
+        }
+    });
+}
+
+// 전체 데이터 가져와서 차트 그리기
+async function fetchChartData() {
+    const res = await fetch('/traffic_scenario/full-prediction', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload())
+    });
+
+    if (!res.ok) {
+        alert('차트 데이터를 가져오는데 실패했습니다');
+        return;
+    }
+
+    const data = await res.json();
+
+    const labels = [];
+    const morningData = [];
+    const eveningData = [];
+
+    // 출근 데이터
+    data.morning.forEach(item => {
+        labels.push(item.datetime.slice(11,16)); // HH:MM
+        morningData.push(item.pred);
+    });
+
+    // 퇴근 데이터
+    data.evening.forEach(item => {
+        eveningData.push(item.pred);
+    });
+
+    renderChart(labels, morningData, eveningData);
+}
+
+// 모든 실행
+async function runAll() {
+    const start = document.getElementById('start');
+    const end = document.getElementById('end');
+    if (!start.value || !end.value) {
+        alert('날짜를 선택해주세요');
+        return;
+    }
+
+    await fetchScenario('/best-commute-time', 'best');
+    await fetchScenario('/worst-offwork-time', 'worst');
+    await fetchScenario('/anomaly-times', 'anomaly');
+
+    await fetchChartData(); // 차트 그리기
+}
+</script>
+{% endblock %}

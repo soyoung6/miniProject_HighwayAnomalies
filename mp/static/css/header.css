@@ -1,0 +1,281 @@
+.header {
+  height: 60px;
+  box-shadow: 0 0 1px black;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  padding: 0 20px;
+  gap: 50px;
+}
+
+#search-form div {
+  position: relative;
+  width: 100%;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  position: relative;
+  width: 300px;
+  max-width: 100%;
+  border-radius: 20px;
+  box-shadow: 0 0 3px black;
+  overflow: visible;
+}
+
+.search:hover {
+  box-shadow: 0 0 5px black;
+  transition: 1s;
+}
+
+.search:focus-within {
+  box-shadow: 0 0 5px black;
+}
+
+.search input {
+  flex: auto;
+  height: 40px;
+  border: none;
+  padding: 0 15px;
+  font-size: 14px;
+  outline: none;
+  border-radius: 20px;
+}
+
+.search-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: black;
+}
+
+.search-btn:hover {
+  color: rgb(156, 156, 156);
+  transition: 0.5s;
+}
+
+#open_cctv_btn {
+  border: none;
+  background-color: #667eea;
+  color: white;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 30px;
+  box-shadow: 0 0 1px black;
+}
+
+#open_cctv_btn:hover {
+  box-shadow: 0 0 3px black;
+  transition: 0.3s;
+}
+
+#fireLoadBtn {
+  background-color: gray;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+#fireLoadBtn:hover {
+  transform: scale(1.05) rotate(15deg);
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 0;
+  z-index: 11000;
+  display: none;
+}
+
+.search-results.show {
+  display: block;
+}
+
+.search-results li {
+  padding: 10px 15px;
+  cursor: pointer;
+  border-bottom: 1px solid #eee;
+  color: #333;
+  transition: background 0.2s;
+  text-align: left;
+}
+
+.search-results li:last-child {
+  border-bottom: none;
+  border-radius: 0 0 8px 8px;
+}
+
+.search-results li:hover {
+  background-color: #f5f5f5;
+}
+
+.search-results li .cctv-name {
+  font-weight: bold;
+  display: block;
+  font-size: 14px;
+}
+
+.search-results li .cctv-info {
+  font-size: 11px;
+  color: #888;
+  margin-top: 2px;
+}
+
+body.dark-mode .search-results {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+body.dark-mode .search-results li {
+  color: #eee;
+  border-bottom-color: #444;
+}
+
+body.dark-mode .search-results li:hover {
+  background-color: #3a3a3a;
+}
+
+body.dark-mode .search-results li .cctv-info {
+  color: #aaa;
+}
+
+#fireMonitorModal,
+#coneMonitorModal,
+#shoulderParkingModal,
+#wrongWayModal {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 600px;
+  height: auto;
+  background: white;
+  box-shadow: 0 0 5px red;
+  z-index: 99999;
+}
+
+#fireMonitorModal img,
+#coneMonitorModal img,
+#shoulderParkingModal img,
+#wrongWayModal img {
+  display: block;
+  width: 100%;
+}
+
+#fireMonitorModal div,
+#shoulderParkingModal div,
+#coneMonitorModal div,
+#wrongWayModal div {
+  padding: 10px;
+  background: #ea6666;
+  color: white;
+}
+
+#fireMonitorModal button,
+#shoulderParkingModal button,
+#coneMonitorModal button,
+#wrongWayModal button {
+  display: flex;
+  justify-content: center;
+  padding: 10px;
+  background: #ea6666;
+  color: white;
+}
+
+#fireMonitorModal button:hover,
+#shoulderParkingModal button:hover,
+#coneMonitorModal button:hover,
+#wrongWayModal button:hover {
+  background: #c25151;
+}
+
+.fireLoadBtn {
+  position: relative;
+}
+
+.fireLoadBtn button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: gray;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fireLoadBtn button:hover {
+  transform: scale(1.05) rotate(15deg);
+}
+
+.fireLoadBtn ul {
+  position: absolute;
+  top: 120%;
+  right: -15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 0px 1px rgba(0, 0, 0, 0.15);
+  list-style: none;
+  padding: 8px 0;
+  margin: 0;
+  width: 70px;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+.fireLoadBtn ul li {
+  padding: 10px 15px;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.2s;
+  font-size: 14px;
+  text-align: left;
+}
+
+.fireLoadBtn ul li:hover {
+  background-color: #f5f5f5;
+  color: #667eea;
+}
+
+body.dark-mode .fireLoadBtn ul {
+  background: #2a2a2a;
+  border-color: #444;
+}
+
+body.dark-mode .fireLoadBtn ul li {
+  color: #eee;
+}
+
+body.dark-mode .fireLoadBtn ul li:hover {
+  background-color: #3a3a3a;
+}

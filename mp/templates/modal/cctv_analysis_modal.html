@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CCTV 모달창</title>
+  </head>
+  <body>
+    <script type="text/template" id="cctv-widget-template">
+      <div class="cctv-widget">
+        <div class="cctv-widget-header">
+          <div class="cctv-widget-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            <span>경부선 CCTV</span>
+          </div>
+          <div class="cctv-widget-controls">
+            <button class="cctv-toggle-btn cctv-control-btn" title="접기/펼치기">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18 15 12 9 6 15"></polyline>
+              </svg>
+            </button>
+            <button class="cctv-close-btn cctv-control-btn" title="닫기">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="cctv-widget-body">
+          <div class="cctv-selector-section">
+            <div class="cctv-selector-header">
+              <label class="cctv-selector-label">CCTV 선택</label>
+              <select class="cctv-selector">
+                <option value="">CCTV를 선택하세요</option>
+                {% for name in cctv_names %}
+                <option value="{{ name }}">{{ name }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button class="cctv-start-btn cctv-widget-start-btn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              시작
+            </button>
+          </div>
+          <div class="cctv-widget-video-area" style="display:none;">
+            <div class="cctv-widget-video-info">
+              <span class="cctv-status-badge">실시간</span>
+              <span class="cctv-current-name">-</span>
+              <span class="header-weather">--°C</span>
+            </div>
+            <div class="cctv-widget-video-wrapper">
+              <img class="cctv-widget-stream-img"
+                src=""
+                alt="실시간 교통량 분석"
+                onerror="this.onerror=null; this.src='https://placehold.co/640x360/E5E7EB/4B5563?text=연결+대기+중';"
+              />
+            </div>
+            <div class="cctv-widget-actions">
+              <button class="cctv-stop-btn cctv-widget-stop-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="6" width="12" height="12"></rect>
+                </svg>
+                중지
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </script>
+
+    <!-- 이미지 확대 오버레이 - 새로 추가된 부분 -->
+    <div class="image-zoom-overlay" id="imageZoomOverlay">
+      <button class="zoom-close-btn">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      <img id="zoomedImage" src="" alt="확대된 이미지" />
+    </div>
+    <!-- 이미지 확대 오버레이 - 새로 추가된 부분 -->
+
+    <script>
+      let widgetCount = 0;
+
+      // 이미지 확대/닫기 함수 - 새로 추가된 부분
+      const zoomOverlay = document.getElementById("imageZoomOverlay");
+      const zoomedImage = document.getElementById("zoomedImage");
+
+      function showZoomedImage(imgSrc) {
+        zoomedImage.src = imgSrc;
+        zoomOverlay.classList.add("active");
+        document.body.style.overflow = "hidden";
+      }
+
+      function hideZoomedImage() {
+        zoomOverlay.classList.remove("active");
+        document.body.style.overflow = "";
+      }
+
+      zoomOverlay.addEventListener("click", (e) => {
+        if (e.target === zoomOverlay || e.target.closest(".zoom-close-btn")) {
+          hideZoomedImage();
+        }
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && zoomOverlay.classList.contains("active")) {
+          hideZoomedImage();
+        }
+      });
+
+      function openCCTVModal(cctvName) {
+        // 파라미터 추가
+        widgetCount += 1;
+
+        const template = document.getElementById(
+          "cctv-widget-template"
+        ).innerHTML;
+        const wrap = document.createElement("div");
+        wrap.innerHTML = template;
+        const widget = wrap.firstElementChild;
+
+        document.body.appendChild(widget);
+        widget.classList.add("show");
+
+        // ✅ 추가: 다크모드 즉시 적용
+        const isDarkMode = localStorage.getItem("darkMode") === "enabled";
+        if (isDarkMode) {
+          const $widget = $(widget);
+          const $body = $widget.find(".cctv-widget-body");
+          const $labels = $widget.find(
+            ".cctv-selector-label, .cctv-current-name"
+          );
+          const $selector = $widget.find(".cctv-selector");
+
+          $widget.css({
+            background: "#2D2D2D",
+            color: "#e9ecef",
+          });
+          $body.css("background", "#2D2D2D");
+          $labels.css("color", "#e9ecef");
+          $selector.css({
+            background: "#2D2D2D",
+            color: "#e9ecef",
+            borderColor: "#dee2e6",
+          });
+        }
+
+        let selectedName = cctvName || ""; // 전달받은 CCTV 이름 사용
+        let isAnalyzing = false;
+
+        const selector = widget.querySelector(".cctv-selector");
+        const startBtn = widget.querySelector(".cctv-start-btn");
+        const stopBtn = widget.querySelector(".cctv-stop-btn");
+        const closeBtn = widget.querySelector(".cctv-close-btn");
+        const toggleBtn = widget.querySelector(".cctv-toggle-btn");
+        const videoArea = widget.querySelector(".cctv-widget-video-area");
+        const selectorArea = widget.querySelector(".cctv-selector-section");
+        const streamImg = widget.querySelector(".cctv-widget-stream-img");
+        const currentNameSpan = widget.querySelector(".cctv-current-name");
+        const headerWeather = widget.querySelector(".header-weather");
+
+        // CCTV 좌표 데이터 (kakao_map.html과 동일)
+        const cctvCoords = {
+          "[경부선] 서초": { lat: 37.48306, lng: 127.02583 },
+          "[경부선] 양재": { lat: 37.461626, lng: 127.042004 },
+          "[경부선] 원지동": { lat: 37.440057, lng: 127.060749 },
+          "[경부선] 상적교": { lat: 37.439058, lng: 127.060888 },
+          "[경부선] 달래내2": { lat: 37.430381, lng: 127.069449 },
+          "[경부선] 달래내1": { lat: 37.42444, lng: 127.07639 },
+          "[경부선] 금현동": { lat: 37.415971, lng: 127.084731 },
+          "[경부선] 금토분기점1": { lat: 37.4153, lng: 127.08472 },
+          "[경부선] 금토분기점2": { lat: 37.41418457, lng: 127.0861359 },
+          "[경부선] 판교분기점": { lat: 37.406538, lng: 127.094315 },
+          "[경부선] 판교3": { lat: 37.4052778, lng: 127.095 },
+          "[경부선] 삼평터널(서울)": { lat: 37.403541, lng: 127.097582 },
+          "[경부선] 판교2": { lat: 37.399693, lng: 127.100437 },
+          "[경부선] 판교1": { lat: 37.399693, lng: 127.100437 },
+          "[경부선] 백현": { lat: 37.376041, lng: 127.103568 },
+          "[경부선] 서울영업소": { lat: 37.36556, lng: 127.1025 },
+          "[경부선] 서울영업소-광장": { lat: 37.35879517, lng: 127.1033173 },
+          "[경부선] 금곡교": { lat: 37.34675865, lng: 127.103224 },
+          "[경부선] 죽전": { lat: 37.314971, lng: 127.103746 },
+          "[경부선] 죽전휴계소": { lat: 37.31, lng: 127.104 },
+          "[경부선] 신갈분기점_경부": { lat: 37.28, lng: 127.1058333 },
+          "[경부선] 신갈분기점2": { lat: 37.28, lng: 127.1058333 },
+          "[경부선] 수원": { lat: 37.26395, lng: 127.103583 },
+          "[경부선] 공세육교": { lat: 37.24564199, lng: 127.1038833 },
+          "[경부선] 기흥휴계소": { lat: 37.23, lng: 127.104 },
+          "[경부선] 기흥": { lat: 37.226449, lng: 127.104398 },
+          "[경부선] 기흥동탄": { lat: 37.222297, lng: 127.101335 },
+          "[경부선] 경부동탄터널(입구방음터널)": { lat: 37.2, lng: 127.1 },
+          "[경부선] 경부동탄터널(부산1)": { lat: 37.195, lng: 127.098 },
+          "[경부선] 경부동탄터널(부산2)": { lat: 37.19, lng: 127.097 },
+          "[경부선] 경부동탄터널(부산3)": { lat: 37.188, lng: 127.096 },
+          "[경부선] 경부동탄터널(부산4)": { lat: 37.186, lng: 127.095 },
+          "[경부선] 경부동탄터널(부산5)": { lat: 37.184, lng: 127.094 },
+          "[경부선] 경부동탄터널(출구방음터널)": { lat: 37.183, lng: 127.093 },
+          "[경부선] 경부동탄터널(출구)": { lat: 37.182, lng: 127.092 },
+          "[경부선] 동탄분기점": { lat: 37.18194444, lng: 127.0958333 },
+          "[경부선] 동탄JC(동탄)": { lat: 37.18, lng: 127.095 },
+          "[경부선] 부산동": { lat: 37.155528, lng: 127.086496 },
+          "[경부선] 오산": { lat: 37.14222, lng: 127.08417 },
+          "[경부선] 원동": { lat: 37.131212, lng: 127.090648 },
+          "[경부선] 남사육교": { lat: 37.12583, lng: 127.09806 },
+          "[경부선] 외동천교": { lat: 37.118007, lng: 127.109972 },
+          "[경부선] 진위천교": { lat: 37.10806, lng: 127.11528 },
+          "[경부선] 남사졸음쉼터": { lat: 37.09196472, lng: 127.122673 },
+          "[경부선] 남사정류장": { lat: 37.085919, lng: 127.125675 },
+          "[경부선] 산하": { lat: 37.08012009, lng: 127.1280441 },
+          "[경부선] 안성휴게소(서울)": { lat: 37.06972, lng: 127.135 },
+          "[경부선] 안성휴계소2": { lat: 37.065, lng: 127.136 },
+          "[경부선] 원곡": { lat: 37.05147533, lng: 127.135994 },
+          "[경부선] 안성분기점1": { lat: 37.04028, lng: 127.13806 },
+          "[경부선] 안성분기점2": { lat: 37.04027778, lng: 127.1380556 },
+          "[경부선] 안성휴계소(부산)": { lat: 37.02, lng: 127.14 },
+          "[경부선] 공도": { lat: 37.002476, lng: 127.1511613 },
+          "[경부선] 원곡졸음쉼터": { lat: 36.99951172, lng: 127.1522293 },
+          "[경부선] 안성": { lat: 36.99083, lng: 127.15583 },
+        };
+
+        async function loadWeatherForCCTV(cctvName) {
+          const coords = cctvCoords[cctvName];
+          if (!coords) {
+            headerWeather.textContent = "--°C";
+            return;
+          }
+
+          headerWeather.textContent = "...";
+
+          try {
+            const resp = await fetch(
+              `/api/weather?latitude=${coords.lat}&longitude=${coords.lng}`
+            );
+            const data = await resp.json();
+
+            if (data.error) throw new Error(data.error);
+
+            // 날씨 상태 판단
+            let statusIcon = "";
+            if (data.rainType && data.rainType != 0) {
+              switch (data.rainType) {
+                case 1:
+                  statusIcon = "🌧️";
+                  break;
+                case 2:
+                  statusIcon = "🌨️";
+                  break;
+                case 3:
+                  statusIcon = "❄️";
+                  break;
+                case 4:
+                  statusIcon = "🌦️";
+                  break;
+                default:
+                  statusIcon = "🌧️";
+                  break;
+              }
+            } else {
+              switch (data.sky) {
+                case 1:
+                  statusIcon = "☀️";
+                  break;
+                case 3:
+                  statusIcon = "⛅";
+                  break;
+                case 4:
+                  statusIcon = "☁️";
+                  break;
+                default:
+                  statusIcon = "🌤️";
+                  break;
+              }
+            }
+            headerWeather.textContent = `${statusIcon} ${data.temp}°C`;
+          } catch (e) {
+            console.error("날씨 로드 오류:", e);
+            headerWeather.textContent = "--°C";
+          }
+        }
+
+        if (cctvName) {
+          selector.value = cctvName;
+          loadWeatherForCCTV(cctvName);
+          setTimeout(() => startBtn.click(), 100);
+        }
+
+        // CCTV 선택
+        selector.addEventListener("change", (e) => {
+          selectedName = e.target.value;
+          if (selectedName) {
+            loadWeatherForCCTV(selectedName);
+          } else {
+            headerWeather.textContent = "--°C";
+          }
+        });
+
+        // 닫기
+        closeBtn.addEventListener("click", () => {
+          videoArea.style.display = "none";
+          selectorArea.style.display = "block";
+          streamImg.src = "";
+          isAnalyzing = false;
+          widget.remove();
+        });
+
+        // 접기/펼치기
+        toggleBtn.addEventListener("click", () => {
+          widget.classList.toggle("collapsed");
+        });
+
+        // 이미지 클릭 시 확대
+        streamImg.addEventListener("click", () => {
+          if (streamImg.src && !streamImg.src.includes("placehold.co")) {
+            showZoomedImage(streamImg.src);
+          }
+        });
+
+        // 시작
+        startBtn.addEventListener("click", async () => {
+          if (!selectedName) return alert("CCTV를 선택하세요.");
+
+          startBtn.disabled = true;
+          startBtn.textContent = "연결 중...";
+
+          try {
+            const formData = new FormData();
+            formData.append("cctv_name", selectedName);
+
+            const response = await fetch("{{ url_for('traffic.index') }}", {
+              method: "POST",
+              body: formData,
+            });
+
+            const html = await response.text();
+            const doc = new DOMParser().parseFromString(html, "text/html");
+            const img = doc.querySelector(
+              'img[alt="실시간 교통량 분석 스트림"]'
+            );
+
+            if (img && img.src) {
+              videoArea.style.display = "block";
+              selectorArea.style.display = "none";
+              currentNameSpan.textContent = selectedName;
+              streamImg.src = img.src;
+              isAnalyzing = true;
+            }
+          } finally {
+            startBtn.disabled = false;
+            startBtn.textContent = "시작";
+          }
+        });
+
+        // 중지
+        stopBtn.addEventListener("click", () => {
+          videoArea.style.display = "none";
+          selectorArea.style.display = "block";
+          streamImg.src = "";
+          isAnalyzing = false;
+        });
+
+        // 드래그
+        let dragging = false;
+        let offsetX, offsetY;
+        const header = widget.querySelector(".cctv-widget-header");
+
+        header.addEventListener("mousedown", (e) => {
+          if (e.target.closest(".cctv-control-btn")) return;
+          dragging = true;
+          offsetX = e.clientX - widget.offsetLeft;
+          offsetY = e.clientY - widget.offsetTop;
+          widget.classList.add("dragging");
+        });
+
+        document.addEventListener("mousemove", (e) => {
+          if (!dragging) return;
+          widget.style.left = `${e.clientX - offsetX}px`;
+          widget.style.top = `${e.clientY - offsetY}px`;
+        });
+
+        document.addEventListener("mouseup", () => {
+          dragging = false;
+          widget.classList.remove("dragging");
+        });
+      }
+    </script>
+  </body>
+</html>

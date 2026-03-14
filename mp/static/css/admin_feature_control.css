@@ -1,0 +1,268 @@
+/* 기능 관리 페이지 스타일 */
+
+.feature-control-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.feature-control-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.feature-control-header h1 {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.feature-control-header .subtitle {
+  color: #666;
+  font-size: 1rem;
+}
+
+/* 빠른 액션 버튼 */
+.quick-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-enable-all {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+}
+
+.btn-enable-all:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-disable-all {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+}
+
+.btn-disable-all:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+/* 기능 카드 그리드 */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.feature-card {
+  background: white;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.feature-icon.fire {
+  background: linear-gradient(135deg, #fef3c7, #fcd34d);
+}
+
+.feature-icon.cone {
+  background: linear-gradient(135deg, #fed7aa, #fb923c);
+}
+
+.feature-icon.parking {
+  background: linear-gradient(135deg, #bbf7d0, #4ade80);
+}
+
+.feature-icon.cctv {
+  background: linear-gradient(135deg, #bfdbfe, #60a5fa);
+}
+
+.feature-info h3 {
+  font-size: 1.25rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.feature-info p {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 1rem;
+}
+
+/* 토글 스위치 */
+.toggle-switch {
+  position: relative;
+  width: 60px;
+  height: 32px;
+  margin: 1rem 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #cbd5e1;
+  transition: 0.4s;
+  border-radius: 32px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.4s;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+input:checked + .slider {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+input:checked + .slider:before {
+  transform: translateX(28px);
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+}
+
+/* 상태 배지 */
+.status-badge {
+  padding: 0.375rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-badge.enabled {
+  background: #d1fae5;
+  color: #059669;
+}
+
+.status-badge.disabled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* 알림 */
+.notification {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.notification.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.notification.success {
+  background: #10b981;
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.notification.error {
+  background: #ef4444;
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+/* 다크모드 지원 */
+body.dark-mode .feature-control-header h1 {
+  color: #f3f4f6;
+}
+
+body.dark-mode .feature-control-header .subtitle {
+  color: #9ca3af;
+}
+
+body.dark-mode .feature-card {
+  background: #374151;
+  border-color: #4b5563;
+}
+
+body.dark-mode .feature-info h3 {
+  color: #f3f4f6;
+}
+
+body.dark-mode .feature-info p {
+  color: #9ca3af;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .feature-control-container {
+    padding: 1rem;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+  }
+
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+}

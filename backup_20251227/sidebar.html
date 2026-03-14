@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.boxicons.com/2.1.4/css/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <title>사이드바</title>
+  </head>
+  <body>
+    <aside>
+      <div class="logo">
+        <span class="menu-icon">
+          <i class="bx bx-menu"></i>
+          <i class="bx bx-x"></i>
+        </span>
+        <p class="owl_head">
+          <a href="/"><i class="bx bx-owl"></i></a>
+        </p>
+      </div>
+      <ul class="side-menu">
+        <li class="nav-item has-sub">
+          <a href="#"
+            ><i class="bx bxs-dashboard"></i><span>테스트</span
+            ><i class="bx bxs-chevron-right"></i
+          ></a>
+          <ul class="sub-menu">
+            <li><a href="{{ url_for('test.test_page') }}">테스트페이지</a></li>
+            <li>
+              <a href="{{ url_for('traffic_predict.traffic_page') }}"
+                >테스트페이지2</a
+              >
+            </li>
+          </ul>
+        </li>
+
+        <li class="nav-item has-sub">
+          <a href="#"
+            ><i class="bx bxs-user"></i><span>사용자페이지</span
+            ><i class="bx bxs-chevron-right"></i
+          ></a>
+          <ul class="sub-menu">
+            <li><a href="{{ url_for('auth.admin_dashboard') }}">관리자</a></li>
+
+            <li><a href="{{ url_for('auth.user_profile')}}">고객</a></li>
+          </ul>
+        </li>
+        <li class="nav-item">
+          <a href="#"><i class="bx bxs-inbox"></i><span>메시지</span></a>
+          <div id="weather-widget" class="weather-widget-sb">
+            <p>날씨 불러오는 중...</p>
+          </div>
+        </li>
+        <li class="nav-item">
+          {% if current_user.is_authenticated %}
+          <button id="logout-open-btn">로그아웃</button>
+          {% else %}
+          <button id="login-open-btn">로그인</button>
+          {% endif %}
+        </li>
+      </ul>
+    </aside>
+    <div class="overlay"></div>
+    <script>
+                       // 페이지가 완전히 로드된 후 실행
+                  document.addEventListener('DOMContentLoaded', function() {
+                    console.log('=== 스크립트 시작 ===');
+
+                    // 로그인 상태 확인
+                    const isAuthenticated = {{ 'true' if current_user.is_authenticated else 'false' }};
+
+                    // 모든 요소 찾기
+                    const loginModal = document.getElementById('login-modal');
+                    const modalBg = document.getElementById('modal-bg');
+                    const loginOpenBtn = document.getElementById('login-open-btn');
+                    const logoutBtn = document.getElementById('logout-open-btn');
+                    const modalForm = document.getElementById("modal-login-form");
+                    const modalFlash = document.getElementById("modal-flash");
+
+                    // 사이드바 요소
+                    const aside = document.querySelector("aside");
+                    const icon = aside?.querySelector(".menu-icon");
+                    const overlay = document.querySelector(".overlay");
+                    const navItems = document.querySelectorAll(".nav-item.has-sub");
+
+                    // 디버깅: 요소 존재 확인
+                    console.log('요소 확인:', {
+                      loginModal: !!loginModal,
+                      modalBg: !!modalBg,
+                      loginOpenBtn: !!loginOpenBtn,
+                      logoutBtn: !!logoutBtn,
+                      modalForm: !!modalForm
+                    });
+
+                    // === 사이드바 기능 ===
+                    if (icon) {
+                      icon.onclick = () => {
+                        aside.classList.toggle("expand");
+                      };
+                    }
+
+                    if (overlay) {
+                      overlay.onclick = () => {
+                        aside.classList.remove("expand");
+                        overlay.style.display = "none";
+                      };
+                    }
+
+                    navItems.forEach((item) => {
+                      const link = item.querySelector("a");
+                      const submenu = item.querySelector(".sub-menu");
+
+                      if (link && submenu) {
+                        link.onclick = (e) => {
+                          e.preventDefault();
+                          const isOpen = item.classList.contains("active");
+
+                          navItems.forEach((i) => {
+                            i.classList.remove("active");
+                            const sub = i.querySelector(".sub-menu");
+                            if (sub) sub.style.maxHeight = null;
+                          });
+
+                          if (!isOpen) {
+                            item.classList.add("active");
+                            submenu.style.maxHeight = submenu.scrollHeight + "px";
+                          }
+                        };
+                      }
+                    });
+
+                    // === 로그인 모달 기능 ===
+                    // 로그인 버튼 클릭 시 모달 열기
+                    if (loginOpenBtn) {
+                      loginOpenBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        console.log('로그인 버튼 클릭');
+
+                        // null 체크!
+                        if (loginModal && modalBg) {
+                          loginModal.classList.add('show');
+                          modalBg.classList.add('show');
+                          console.log('모달 열림');
+                        } else {
+                          console.error('모달 요소를 찾을 수 없습니다:', {
+                            loginModal: !!loginModal,
+                            modalBg: !!modalBg
+                          });
+                        }
+                      });
+                    } else {
+                      console.warn('로그인 버튼(#login-open-btn)을 찾을 수 없습니다');
+                    }
+
+                    // 모달 배경 클릭 시 닫기
+                    if (modalBg) {
+                      modalBg.addEventListener('click', function() {
+                        if (loginModal) {
+                          loginModal.classList.remove('show');
+                          modalBg.classList.remove('show');
+                          console.log('모달 닫힘');
+                        }
+                      });
+                    }
+
+                    // 로그인 폼 제출
+                    if (modalForm) {
+                      modalForm.addEventListener("submit", async (e) => {
+                        e.preventDefault();
+                        console.log('로그인 폼 제출');
+
+                        const submitButton = modalForm.querySelector('button[type="submit"]');
+
+                        if (modalFlash) {
+                          modalFlash.textContent = "";
+                        }
+
+                        if (submitButton) {
+                          submitButton.disabled = true;
+                          submitButton.textContent = "로그인 중...";
+                        }
+
+                        const formData = new FormData(modalForm);
+
+                        try {
+                          const resp = await fetch("{{ url_for('auth.login_modal') }}", {
+                            method: "POST",
+                            body: formData,
+                          });
+
+                          const data = await resp.json();
+                          console.log('서버 응답:', data);
+
+                          if (data.success) {
+                            if (modalFlash) {
+                              modalFlash.style.backgroundColor = "#d4edda";
+                              modalFlash.style.color = "#155724";
+                              modalFlash.style.borderColor = "#c3e6cb";
+                              modalFlash.textContent = "로그인 성공!";
+                            }
+
+                            setTimeout(() => {
+                              window.location.href = data.redirect_url || "/";
+                            }, 500);
+                          } else {
+                            if (modalFlash) {
+                              modalFlash.style.backgroundColor = "#fee";
+                              modalFlash.style.color = "#c33";
+                              modalFlash.style.borderColor = "#fcc";
+                              modalFlash.textContent = data.message || "로그인에 실패했습니다.";
+                            }
+
+                            if (submitButton) {
+                              submitButton.disabled = false;
+                              submitButton.textContent = "로그인";
+                            }
+                          }
+                        } catch (err) {
+                          console.error("로그인 오류:", err);
+
+                          if (modalFlash) {
+                            modalFlash.style.backgroundColor = "#fee";
+                            modalFlash.style.color = "#c33";
+                            modalFlash.textContent = "서버와 통신할 수 없습니다.";
+                          }
+
+                          if (submitButton) {
+                            submitButton.disabled = false;
+                            submitButton.textContent = "로그인";
+                          }
+                        }
+                      });
+                    }
+
+                    // 로그아웃 버튼 처리
+                    if (logoutBtn) {
+                      logoutBtn.addEventListener('click', async function() {
+                        if (!confirm('로그아웃 하시겠습니까?')) return;
+
+                        try {
+                          const resp = await fetch("{{ url_for('security.logout') }}", {
+                            method: "POST"
+                          });
+
+                          if (resp.ok || resp.redirected) {
+                            window.location.href = "{{ url_for('index.index') }}";
+                          }
+                        } catch (err) {
+                          console.error('로그아웃 실패:', err);
+                          window.location.href = "{{ url_for('security.logout') }}";
+                        }
+                      });
+                    }
+
+                  // 페이지 로드 시 로그인 상태면 모달 숨김
+                    if (isAuthenticated) {
+                      if (loginModal) loginModal.classList.remove('show');
+                      if (modalBg) modalBg.classList.remove('show');
+                    }
+
+                    // === 로그인/로그아웃 버튼 표시 제어 ===
+                    if (isAuthenticated) {
+                      // 로그인 상태: 로그인 버튼 숨기고, 로그아웃 버튼 보이기
+                      if (loginOpenBtn) loginOpenBtn.style.display = 'none';
+                      if (logoutBtn) logoutBtn.style.display = 'block';
+                    } else {
+                      // 비로그인 상태: 로그인 버튼 보이고, 로그아웃 버튼 숨기기
+                      if (loginOpenBtn) loginOpenBtn.style.display = 'block';
+                      if (logoutBtn) logoutBtn.style.display = 'none';
+                    }
+
+                    console.log('=== 스크립트 초기화 완료 ===');
+
+                  });
+
+      // ===== 날씨 위젯 로드 =====
+        async function loadWeather() {
+          const widget = document.getElementById("weather-widget");
+          if (!widget) return;
+
+          try {
+            // 사용자 위치 가져오기
+            navigator.geolocation.getCurrentPosition(async (pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+
+              // Flask API 요청
+              const resp = await fetch(`/api/weather?latitude=${lat}&longitude=${lon}`);
+              const data = await resp.json();
+
+              // 날씨 상태 판단 (PTY 우선, SKY 보조)
+              let weatherText = "";
+              if (data.rainType && data.rainType != 0) {
+                switch (data.rainType) {
+                  case 1: weatherText = "비"; break;
+                  case 2: weatherText = "비/눈"; break;
+                  case 3: weatherText = "눈"; break;
+                  case 4: weatherText = "소나기"; break;
+                  default: weatherText = "강수"; break;
+                }
+              } else {
+                switch (data.sky) {
+                  case 1: weatherText = "맑음"; break;
+                  case 3: weatherText = "구름많음"; break;
+                  case 4: weatherText = "흐림"; break;
+                  default: weatherText = "정보 없음"; break;
+                }
+              }
+
+              // 위젯 HTML 업데이트
+              widget.innerHTML = `
+                <div class="temp">${data.temp}°C</div>
+                <div class="sky">${weatherText}</div>
+                <div class="humidity">습도: ${data.humidity}%</div>
+                <div class="wind">풍속: ${data.wind} m/s</div>
+                <div class="rain">강수량: ${data.rain} mm</div>
+                <div class="location">위치: ${lat.toFixed(5)}, ${lon.toFixed(5)}</div>
+              `;
+            },
+            (err) => {
+              widget.innerHTML = "<p>위치 정보를 가져올 수 없습니다.</p>";
+            });
+          } catch (e) {
+            widget.innerHTML = "<p>날씨 정보를 불러올 수 없습니다.</p>";
+          }
+        }
+
+        loadWeather();
+    </script>
+  </body>
+</html>

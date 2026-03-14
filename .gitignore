@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+instance/
+.env
+.venv/
+venv/
+.env/
+.vscode/
+*.sqlite
+yolo11s.pt
+.idea
+config.py

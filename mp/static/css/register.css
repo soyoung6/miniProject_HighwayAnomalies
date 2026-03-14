@@ -1,0 +1,160 @@
+body {
+  width: 100%;
+}
+
+h2 {
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  text-align: center;
+  margin-top: 45px;
+}
+
+.mainForm {
+  width: 25%;
+  margin: 0 auto;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.mainForm i {
+  color: #000000;
+}
+
+.mainForm input {
+  background-color: #ffffff;
+  color: #000000;
+  border: none;
+}
+
+.mainForm input:focus {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+/* Placeholder에 변수 적용 */
+.mainForm input::placeholder {
+  color: #000000;
+  opacity: 0.8;
+  transition: color 0.3s ease;
+}
+
+.accessionButton button {
+  cursor: pointer;
+}
+
+.idForm,
+.emailForm,
+.pwForm,
+.repwForm,
+.nameForm,
+.birthForm,
+.phoneForm,
+.accessionButton {
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  border-radius: 3px;
+  border: none;
+  box-shadow: 0 0 1px;
+  border-radius: 3px;
+  padding: 5px 5px;
+}
+
+.bxr {
+  font-size: 22px;
+  margin-left: 3%;
+  margin-right: 3%;
+  color: #212121;
+}
+
+.accessionButton {
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.idForm input,
+.emailForm input,
+.pwForm input,
+.repwForm input,
+.nameForm input,
+.birthForm input {
+  width: 85%;
+  height: 40px;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+  text-align: left;
+}
+
+/* 다크모드 자동완성 */
+body.dark-mode .mainForm input:-webkit-autofill,
+body.dark-mode .mainForm input:-webkit-autofill:hover,
+body.dark-mode .mainForm input:-webkit-autofill:focus,
+body.dark-mode .mainForm input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #343a40 inset !important;
+  -webkit-text-fill-color: #e9ecef !important;
+}
+
+.nameForm {
+  margin-top: 25px;
+}
+
+/* date input 스타일 */
+.birthForm input[type="date"] {
+  width: 85%;
+  height: 40px;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+}
+
+/* 캘린더 아이콘을 투명하게 만들고 input 전체 영역으로 확장 */
+.birthForm input[type="date"]::-webkit-calendar-picker-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  height: auto;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0; /* 투명하게 */
+}
+
+/* Firefox 지원 */
+.birthForm input[type="date"] {
+  -moz-appearance: textfield;
+  color: #999999;
+}
+
+.phoneForm select,
+.phoneForm input {
+  width: 27%;
+  height: 40px;
+  text-align: center;
+  border: none;
+  box-shadow: 0 0 1px;
+  border-radius: 3px;
+}
+
+.phoneForm select {
+  cursor: pointer;
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.accessionButton {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+  margin-bottom: 25px;
+}
+
+.accessionButton button {
+  width: 100%;
+  height: 55px;
+  border-radius: 5px;
+  background-color: royalblue;
+  color: white;
+}

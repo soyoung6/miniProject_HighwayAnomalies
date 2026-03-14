@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인</title>
+  </head>
+  <body>
+    <div id="modal-bg" class="modal-bg"></div>
+    <div id="login-modal" class="modal">
+      <div class="modal-content">
+        <h3>로그인</h3>
+        {% with messages = get_flashed_messages() %} {% if messages %}
+        <div class="flash-message">
+          {% for message in messages %}
+          <div>{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %} {% endwith %}
+
+        <div id="modal-flash"></div>
+        <form
+          id="modal-login-form"
+          action="{{ url_for('security.login') }}"
+          method="POST"
+        >
+          <div class="email_input">
+            <label for="email">이메일</label>
+            <input type="email" name="email" id="email" required />
+          </div>
+          <div class="password_input">
+            <label for="password">비밀번호</label>
+            <input type="password" name="password" id="password" required />
+          </div>
+          <div class="login_ckbox">
+            <label for="remember">로그인 상태 유지</label>
+            <input type="checkbox" name="remember" id="remember" />
+          </div>
+          <div class="login_btn">
+            <button type="submit">로그인</button>
+          </div>
+        </form>
+        <p class="modal_p">
+          아직 계정이 없나요?
+          <a href="{{ url_for('auth.register') }}">회원가입</a>
+        </p>
+        <p class="modal_ps">
+          <a href="{{ url_for('security.forgot_password') }}"
+            >비밀번호 재설정</a
+          >
+        </p>
+      </div>
+    </div>
+
+    <script>
+      const modalForm = document.getElementById("modal-login-form");
+      const modalFlash = document.getElementById("modal-flash");
+      const submitButton = modalForm.querySelector('button[type="submit"]');
+
+      modalForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // 오류 메시지 초기화
+        modalFlash.textContent = "";
+        submitButton.disabled = true;
+        submitButton.textContent = "로그인 중...";
+
+        const formData = new FormData(modalForm);
+
+        try {
+          // 기존 security.login 엔드포인트 사용
+          const resp = await fetch("{{ url_for('security.login') }}", {
+            method: "POST",
+            body: formData,
+          });
+
+          const data = await resp.json();
+
+          if (data.success) {
+            // 성공 시
+            window.location.href = data.redirect_url || "/";
+          } else {
+            // 실패 시
+            modalFlash.textContent = data.message || "로그인에 실패했습니다.";
+            submitButton.disabled = false;
+            submitButton.textContent = "로그인";
+          }
+        } catch (err) {
+          modalFlash.textContent = "서버와 통신할 수 없습니다.";
+          submitButton.disabled = false;
+          submitButton.textContent = "로그인";
+          console.error("로그인 오류:", err);
+        }
+      });
+    </script>
+  </body>
+</html>

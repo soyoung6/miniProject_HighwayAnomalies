@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.boxicons.com/3.0.5/fonts/basic/boxicons.min.css"
+      rel="stylesheet"
+    />
+    <title>Footer</title>
+  </head>
+  <body>
+    <footer class="footer">
+      <div id="weather-widget-footer" class="weather-widget-ft">
+        <p>날씨 불러오는 중...</p>
+      </div>
+    </footer>
+    <script>
+      // 풋터 날씨 위젯 로드 함수
+      window.loadFooterWeather = async function () {
+        console.log("풋터 날씨 위젯 로드 시작");
+
+        const widget = document.getElementById("weather-widget-footer");
+        console.log("위젯 요소:", widget);
+
+        if (!widget) {
+          console.error("weather-widget-footer 요소를 찾을 수 없습니다");
+          return;
+        }
+
+        try {
+          console.log("위치 정보 요청 중...");
+
+          navigator.geolocation.getCurrentPosition(
+            async (pos) => {
+              const lat = pos.coords.latitude;
+              const lon = pos.coords.longitude;
+              console.log("풋터 위치 정보:", lat, lon);
+
+              const apiUrl = `/api/weather?latitude=${lat}&longitude=${lon}`;
+              console.log("풋터 API 호출:", apiUrl);
+
+              const resp = await fetch(apiUrl);
+              console.log("풋터 응답 상태:", resp.status);
+
+              if (!resp.ok) {
+                throw new Error(`HTTP ${resp.status}`);
+              }
+
+              const data = await resp.json();
+              console.log("풋터 받은 데이터:", data);
+
+              if (data.error) {
+                throw new Error(data.error);
+              }
+
+              // 날씨 상태 판단
+              let weatherText = "";
+              if (data.rainType && data.rainType != 0) {
+                switch (data.rainType) {
+                  case 1:
+                    weatherText = "비";
+                    break;
+                  case 2:
+                    weatherText = "비/눈";
+                    break;
+                  case 3:
+                    weatherText = "눈";
+                    break;
+                  case 4:
+                    weatherText = "소나기";
+                    break;
+                  default:
+                    weatherText = "강수";
+                    break;
+                }
+              } else {
+                switch (data.sky) {
+                  case 1:
+                    weatherText = "맑음";
+                    break;
+                  case 3:
+                    weatherText = "구름많음";
+                    break;
+                  case 4:
+                    weatherText = "흐림";
+                    break;
+                  default:
+                    weatherText = "정보 없음";
+                    break;
+                }
+              }
+
+              // 위젯 HTML 업데이트
+              const isDarkMode = document.body.classList.contains("dark-mode");
+              const textColor = isDarkMode ? "#e9ecef" : "#000000";
+
+              widget.innerHTML = `
+                <div class="temp">${data.temp}°C</div>
+                <div class="sky">${weatherText}</div>
+                <div class="humidity">습도: ${data.humidity}%</div>
+                <div class="wind">풍속: ${data.wind} m/s</div>
+                <div class="rain">강수량: ${data.rain} mm</div>
+                <div class="location">위치: ${lat.toFixed(5)}, ${lon.toFixed(
+                5
+              )}</div>
+              `;
+              console.log("풋터 날씨 정보 업데이트 완료");
+            },
+            (err) => {
+              console.error("풋터 위치 정보 오류:", err);
+              widget.innerHTML = "<p>위치 정보를 가져올 수 없습니다.</p>";
+            }
+          );
+        } catch (e) {
+          console.error("풋터 날씨 정보 오류:", e);
+          widget.innerHTML = `<p>날씨 정보를 불러올 수 없습니다. (${e.message})</p>`;
+        }
+      };
+
+      // 페이지 로드 시 자동 실행
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", window.loadFooterWeather);
+      } else {
+        window.loadFooterWeather();
+      }
+    </script>
+  </body>
+</html>

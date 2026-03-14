@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>다음 지도 API</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+    <div id="fire-alert">
+      ⚠ 화재 감지 긴급 상황! ⚠<br />
+      <span
+        id="fire-location"
+        style="font-size: 18px; font-weight: normal"
+      ></span>
+    </div>
+    <div id="map"></div>
+    <div id="status-panel">
+      <h3>경부선 교통상태</h3>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #00aa00"></div>
+        <span>원활</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ffa500"></div>
+        <span>서행</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff0000"></div>
+        <span>정체</span>
+      </div>
+      <div id="last-update">마지막 업데이트: -</div>
+    </div>
+
+    <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey={{ kakao_app_key }}"></script>
+    <script>
+      var cctvOverlays = [];
+
+      var mapContainer = document.getElementById("map"),
+        mapOption = {
+          center: new kakao.maps.LatLng(37.26, 127.1),
+          level: 8,
+          mapTypeId: kakao.maps.MapTypeId.HYBRID,
+        };
+
+      var map = new kakao.maps.Map(mapContainer, mapOption);
+
+      map.addOverlayMapTypeId(kakao.maps.MapTypeId.TERRAIN);
+
+      var mapTypeControl = new kakao.maps.MapTypeControl();
+      map.addControl(mapTypeControl, kakao.maps.ControlPosition.TOPRIGHT);
+
+      var zoomControl = new kakao.maps.ZoomControl();
+      map.addControl(zoomControl, kakao.maps.ControlPosition.RIGHT);
+
+      // CCTV 데이터
+      var cctvData = [
+        { name: "[경부선] 서초", lng: 127.02583, lat: 37.48306 },
+        { name: "[경부선] 양재", lng: 127.042004, lat: 37.461626 },
+        { name: "[경부선] 원지동", lng: 127.060749, lat: 37.440057 },
+        { name: "[경부선] 상적교", lng: 127.060888, lat: 37.439058 },
+        { name: "[경부선] 달래내2", lng: 127.069449, lat: 37.430381 },
+        { name: "[경부선] 달래내1", lng: 127.07639, lat: 37.42444 },
+        { name: "[경부선] 금현동", lng: 127.084731, lat: 37.415971 },
+        { name: "[경부선] 금토분기점1", lng: 127.08472, lat: 37.4153 },
+        { name: "[경부선] 금토분기점2", lng: 127.0861359, lat: 37.41418457 },
+        { name: "[경부선] 판교분기점", lng: 127.094315, lat: 37.406538 },
+        { name: "[경부선] 판교3", lng: 127.095, lat: 37.4052778 },
+        { name: "[경부선] 삼평터널(서울)", lng: 127.097582, lat: 37.403541 },
+        { name: "[경부선] 판교2", lng: 127.100437, lat: 37.399693 },
+        { name: "[경부선] 판교1", lng: 127.100437, lat: 37.399693 },
+        { name: "[경부선] 백현", lng: 127.103568, lat: 37.376041 },
+        { name: "[경부선] 서울영업소", lng: 127.1025, lat: 37.36556 },
+        {
+          name: "[경부선] 서울영업소-광장",
+          lng: 127.1033173,
+          lat: 37.35879517,
+        },
+        { name: "[경부선] 금곡교", lng: 127.103224, lat: 37.34675865 },
+        { name: "[경부선] 죽전", lng: 127.103746, lat: 37.314971 },
+        { name: "[경부선] 신갈분기점2", lng: 127.1058333, lat: 37.28 },
+        { name: "[경부선] 수원", lng: 127.103583, lat: 37.26395 },
+        { name: "[경부선] 공세육교", lng: 127.1038833, lat: 37.24564199 },
+        { name: "[경부선] 기흥", lng: 127.104398, lat: 37.226449 },
+        { name: "[경부선] 기흥동탄", lng: 127.101335, lat: 37.222297 },
+        { name: "[경부선] 동탄분기점", lng: 127.0958333, lat: 37.18194444 },
+        { name: "[경부선] 부산동", lng: 127.086496, lat: 37.155528 },
+        { name: "[경부선] 오산", lng: 127.08417, lat: 37.14222 },
+        { name: "[경부선] 원동", lng: 127.090648, lat: 37.131212 },
+        { name: "[경부선] 남사육교", lng: 127.09806, lat: 37.12583 },
+        { name: "[경부선] 외동천교", lng: 127.109972, lat: 37.118007 },
+        { name: "[경부선] 진위천교", lng: 127.11528, lat: 37.10806 },
+        { name: "[경부선] 남사졸음쉼터", lng: 127.122673, lat: 37.09196472 },
+        { name: "[경부선] 남사정류장", lng: 127.125675, lat: 37.085919 },
+        { name: "[경부선] 산하", lng: 127.1280441, lat: 37.08012009 },
+        { name: "[경부선] 안성휴게소(서울)", lng: 127.135, lat: 37.06972 },
+        { name: "[경부선] 원곡", lng: 127.135994, lat: 37.05147533 },
+        { name: "[경부선] 안성분기점1", lng: 127.13806, lat: 37.04028 },
+        { name: "[경부선] 안성분기점2", lng: 127.1380556, lat: 37.04027778 },
+        { name: "[경부선] 공도", lng: 127.1511613, lat: 37.002476 },
+        { name: "[경부선] 원곡졸음쉼터", lng: 127.1522293, lat: 36.99951172 },
+        { name: "[경부선] 안성", lng: 127.15583, lat: 36.99083 },
+      ];
+
+      // 다크모드 추가
+      function createCustomOverlay(position, name) {
+        const isDarkMode = document.body.classList.contains("dark-mode");
+
+        const overlayStyle = isDarkMode
+          ? "padding:1px 4px;background:rgba(255,255,255,0.7);color:#000;border-radius:15px;font-size:12px;white-space:nowrap;box-shadow:0 0px 2px rgba(0,0,0,0.3);"
+          : "padding:1px 4px;background:rgba(255,255,255,0.7);color:#000;border-radius:15px;font-size:12px;white-space:nowrap;box-shadow:0 0px 2px rgba(0,0,0,0.3);";
+
+        return new kakao.maps.CustomOverlay({
+          map: map,
+          clickable: true,
+          content: `<div style="${overlayStyle}">${name}</div>`,
+          position: position,
+          yAnchor: 1.5,
+        });
+      }
+
+      // 마커 이미지 설정
+      var markerImageUrl =
+          "https://t1.daumcdn.net/localimg/localimages/07/2012/img/marker_p.png",
+        markerImageSize = new kakao.maps.Size(35, 42),
+        markerImageOptions = {
+          offset: new kakao.maps.Point(20, 42),
+        };
+
+      var markerImage = new kakao.maps.MarkerImage(
+        markerImageUrl,
+        markerImageSize,
+        markerImageOptions
+      );
+
+      var polylines = [];
+
+      // 상태별 색상
+      function getColorByStatus(status) {
+        switch (status) {
+          case "congested":
+            return "#FF0000"; // 정체
+          case "slow":
+            return "#FFA500"; // 서행
+          case "smooth":
+            return "#00AA00"; // 원활
+          default:
+            return "#999999"; // 기타
+        }
+      }
+
+      // DB 교통 데이터 기반 마커 표시
+      var trafficMarkers = []; // DB 교통상태 마커 저장용
+
+      async function loadTrafficData() {
+        try {
+          // Flask API 호출 (traffic_mgmt.py의 /api/traffic)
+          const response = await fetch("/api/traffic");
+
+          if (!response.ok) {
+            throw new Error("API 호출 실패");
+          }
+
+          const apiData = await response.json();
+          console.log("📊 DB 교통 데이터:", apiData);
+
+          // 기존 교통상태 마커 제거
+          trafficMarkers.forEach((m) => m.setMap(null));
+          trafficMarkers = [];
+
+          // DB 데이터로 교통상태 원형 마커 표시
+          apiData.forEach((item) => {
+            const position = new kakao.maps.LatLng(item.lat, item.lng);
+            const color = getColorByStatus(item.status);
+
+            // 원형 마커 생성
+            const circle = new kakao.maps.Circle({
+              map: map,
+              center: position,
+              radius: 300, // 300m 반경
+              strokeWeight: 2,
+              strokeColor: color,
+              strokeOpacity: 0.8,
+              fillColor: color,
+              fillOpacity: 0.5,
+            });
+            trafficMarkers.push(circle);
+
+            // 구간 정보 오버레이 (클릭 시 표시)
+            const statusText =
+              item.status === "congested"
+                ? "정체"
+                : item.status === "slow"
+                ? "서행"
+                : "원활";
+            const content = `
+              <div style="padding:8px 12px;background:rgba(0,0,0,0.8);color:#fff;border-radius:8px;font-size:12px;white-space:nowrap;">
+                <strong>${item.name}</strong><br>
+                상행: ${item.status_up} | 하행: ${item.status_down}
+              </div>
+            `;
+            const overlay = new kakao.maps.CustomOverlay({
+              position: position,
+              content: content,
+              yAnchor: 1.3,
+            });
+
+            // 원형 클릭 이벤트
+            kakao.maps.event.addListener(circle, "click", function () {
+              overlay.setMap(overlay.getMap() ? null : map);
+            });
+          });
+
+          // 기존 cctvData 기반 폴리라인도 유지 (기존 로직)
+          polylines.forEach((p) => p.setMap(null));
+          polylines = [];
+
+          for (let i = 0; i < cctvData.length - 1; i++) {
+            var start = new kakao.maps.LatLng(cctvData[i].lat, cctvData[i].lng);
+            var end = new kakao.maps.LatLng(
+              cctvData[i + 1].lat,
+              cctvData[i + 1].lng
+            );
+
+            // cctvData와 가장 가까운 DB 데이터 찾아서 상태 결정
+            const nearbyStatus = apiData.find(
+              (a) =>
+                Math.abs(a.lat - cctvData[i].lat) < 0.05 &&
+                Math.abs(a.lng - cctvData[i].lng) < 0.05
+            );
+            var color = nearbyStatus
+              ? getColorByStatus(nearbyStatus.status)
+              : "#999999";
+
+            var polyline = new kakao.maps.Polyline({
+              map: map,
+              path: [start, end],
+              strokeWeight: 10,
+              strokeColor: color,
+              strokeOpacity: 0.4,
+              strokeStyle: "solid",
+            });
+            polylines.push(polyline);
+          }
+
+          // 업데이트 시간 표시
+          var now = new Date();
+          var timeStr =
+            now.getHours().toString().padStart(2, "0") +
+            ":" +
+            now.getMinutes().toString().padStart(2, "0");
+          document.getElementById("last-update").textContent =
+            "마지막 업데이트: " + timeStr;
+
+          console.log("교통 데이터 로드 완료:", apiData.length + "개 구간");
+
+          return apiData;
+        } catch (error) {
+          console.error("교통 데이터 로드 실패:", error);
+
+          // 오류 발생 시 기존 cctvData 기반 폴백
+          polylines.forEach((p) => p.setMap(null));
+          polylines = [];
+
+          var statuses = ["smooth", "slow", "congested"];
+          for (let i = 0; i < cctvData.length - 1; i++) {
+            var start = new kakao.maps.LatLng(cctvData[i].lat, cctvData[i].lng);
+            var end = new kakao.maps.LatLng(
+              cctvData[i + 1].lat,
+              cctvData[i + 1].lng
+            );
+            var color = getColorByStatus(
+              statuses[Math.floor(Math.random() * 3)]
+            );
+
+            var polyline = new kakao.maps.Polyline({
+              map: map,
+              path: [start, end],
+              strokeWeight: 10,
+              strokeColor: color,
+              strokeOpacity: 0.4,
+              strokeStyle: "solid",
+            });
+            polylines.push(polyline);
+          }
+
+          return cctvData;
+        }
+      }
+
+      // 풋터 날씨 위젯 업데이트 함수
+      async function updateFooterWeather(cctvName, lat, lon) {
+        const widget = document.getElementById("weather-widget-footer");
+
+        if (!widget) {
+          console.error("weather-widget-footer 요소를 찾을 수 없습니다");
+          return;
+        }
+
+        widget.innerHTML = `<p>${cctvName} 날씨 불러오는 중...</p>`;
+
+        try {
+          const apiUrl = `/api/weather?latitude=${lat}&longitude=${lon}`;
+          const resp = await fetch(apiUrl);
+
+          if (!resp.ok) {
+            throw new Error(`HTTP ${resp.status}`);
+          }
+
+          const data = await resp.json();
+
+          if (data.error) {
+            throw new Error(data.error);
+          }
+
+          let weatherText = "";
+          if (data.rainType && data.rainType != 0) {
+            switch (data.rainType) {
+              case 1:
+                weatherText = "비";
+                break;
+              case 2:
+                weatherText = "비/눈";
+                break;
+              case 3:
+                weatherText = "눈";
+                break;
+              case 4:
+                weatherText = "소나기";
+                break;
+              default:
+                weatherText = "강수";
+                break;
+            }
+          } else {
+            switch (data.sky) {
+              case 1:
+                weatherText = "맑음";
+                break;
+              case 3:
+                weatherText = "구름많음";
+                break;
+              case 4:
+                weatherText = "흐림";
+                break;
+              default:
+                weatherText = "정보 없음";
+                break;
+            }
+          }
+
+          widget.innerHTML = `
+          <div class="weather-widget">
+            <div class="location-name"> ${cctvName}</div>
+            <div class="temp">${data.temp}°C</div>
+            <div class="sky">${weatherText}</div>
+            <div class="humidity">습도: ${data.humidity}%</div>
+            <div class="wind">풍속: ${data.wind} m/s</div>
+            <div class="rain">강수량: ${data.rain} mm</div>
+            <div class="location">위치: ${lat.toFixed(5)}, ${lon.toFixed(
+            5
+          )}</div>
+
+          `;
+        } catch (e) {
+          console.error("날씨 정보 오류:", e);
+          widget.innerHTML = `<p>${cctvName}<br>날씨 정보를 불러올 수 없습니다. (${e.message})</p>`;
+        }
+      }
+
+      // 초기 교통 데이터 로드
+      var currentTrafficData = loadTrafficData();
+
+      // 모든 CCTV 위치에 마커 생성 (원본 기능 유지)
+      cctvData.forEach(function (cctv, index) {
+        var position = new kakao.maps.LatLng(cctv.lat, cctv.lng);
+
+        var marker = new kakao.maps.Marker({
+          position: position,
+          image: markerImage,
+          map: map,
+        });
+
+        // 다크모드를 지원하는 커스텀 오버레이 생성 (CCTV 이름 표시)
+        var customOverlay = createCustomOverlay(position, cctv.name);
+        // 오버레이를 배열에 저장 (다크모드 전환 시 업데이트를 위해 필요)
+        cctvOverlays.push(customOverlay);
+
+        // 마커 클릭 이벤트 - CCTV 모달 열기 + 날씨 업데이트
+        kakao.maps.event.addListener(marker, "click", function () {
+          // 풋터 날씨 업데이트 추가
+          updateFooterWeather(cctv.name, cctv.lat, cctv.lng);
+
+          // 현재 교통 상태 가져오기
+          currentTrafficData.then((data) => {
+            var currentStatus = data[index].status;
+            var statusText =
+              currentStatus === "congested"
+                ? "정체"
+                : currentStatus === "slow"
+                ? "서행"
+                : "원활";
+
+            // openCCTVModal 함수가 존재하는지 확인
+            if (typeof openCCTVModal === "function") {
+              openCCTVModal(cctv.name);
+            } else {
+              alert(
+                cctv.name +
+                  "\n교통상태: " +
+                  statusText +
+                  "\n위도: " +
+                  cctv.lat +
+                  "\n경도: " +
+                  cctv.lng
+              );
+            }
+          });
+        });
+      });
+
+      // 5분마다 교통 상태 자동 갱신
+      setInterval(function () {
+        currentTrafficData = loadTrafficData();
+      }, 5 * 60 * 1000);
+
+      // 검색 기능 구현
+      const searchInput = document.getElementById("keyword");
+      const searchResults = document.getElementById("search-results");
+      const searchForm = document.getElementById("search-form");
+      const searchBtn = document.getElementById("search-btn");
+
+      // 검색 실행 함수
+      function executeSearch() {
+        const keyword = searchInput.value.trim();
+        if (keyword === "") {
+          alert("검색어를 입력해주세요.");
+          return;
+        }
+
+        const filtered = cctvData.filter((cctv) => cctv.name.includes(keyword));
+
+        if (filtered.length > 0) {
+          moveToCCTV(filtered[0]);
+          searchInput.blur(); // 포커스 해제
+        } else {
+          alert("검색 결과가 없습니다.");
+        }
+      }
+
+      // 검색어 입력 시 필터링
+      if (searchInput) {
+        searchInput.addEventListener("input", function () {
+          const keyword = this.value.trim();
+          if (keyword === "") {
+            searchResults.classList.remove("show");
+            return;
+          }
+          filterCCTV(keyword);
+        });
+
+        // 엔터키 처리
+        searchInput.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            executeSearch();
+          }
+        });
+
+        // 포커스 시 검색어가 있으면 결과 보여주기, 없으면 전체 목록
+        searchInput.addEventListener("focus", function () {
+          if (this.value.trim() !== "") {
+            filterCCTV(this.value.trim());
+          } else {
+            renderSearchResults(cctvData);
+          }
+        });
+      }
+
+      // 검색 버튼 클릭 처리
+      if (searchBtn) {
+        searchBtn.addEventListener("click", function () {
+          executeSearch();
+        });
+      }
+
+      // 외부 클릭 시 닫기
+      document.addEventListener("click", function (e) {
+        if (!searchForm.contains(e.target)) {
+          searchResults.classList.remove("show");
+        }
+      });
+
+      function filterCCTV(keyword) {
+        const filtered = cctvData.filter((cctv) => cctv.name.includes(keyword));
+        renderSearchResults(filtered);
+      }
+
+      function renderSearchResults(results) {
+        searchResults.innerHTML = "";
+
+        if (results.length === 0) {
+          const li = document.createElement("li");
+          li.textContent = "검색 결과가 없습니다.";
+          li.style.cursor = "default";
+          li.style.textAlign = "center";
+          li.style.color = "#999";
+          searchResults.appendChild(li);
+        } else {
+          results.forEach((cctv) => {
+            const li = document.createElement("li");
+            li.innerHTML = `
+        <span class="cctv-name">${cctv.name}</span>
+        <span class="cctv-info">Lat: ${cctv.lat}, Lng: ${cctv.lng}</span>
+      `;
+            li.addEventListener("click", () => {
+              moveToCCTV(cctv);
+            });
+            searchResults.appendChild(li);
+          });
+        }
+
+        searchResults.classList.add("show");
+      }
+
+      function moveToCCTV(cctv) {
+        const moveLatLon = new kakao.maps.LatLng(cctv.lat, cctv.lng);
+        map.setCenter(moveLatLon);
+        map.setLevel(3); // 줌 레벨 확대
+
+        // 검색창 닫기
+        searchResults.classList.remove("show");
+        searchInput.value = cctv.name;
+
+        if (typeof updateFooterWeather === "function") {
+          updateFooterWeather(cctv.name, cctv.lat, cctv.lng);
+        }
+
+        if (typeof openCCTVModal === "function") {
+          openCCTVModal(cctv.name);
+        }
+      }
+
+      // 데모용: 30초마다 갱신 (테스트용 - 필요시 주석 해제)
+      // setInterval(function() {
+      //   currentTrafficData = loadTrafficData();
+      // }, 30 * 1000);
+      // 화재 감시 함수
+      async function monitorFireStatus() {
+        const alertDiv = document.getElementById("fire-alert");
+        const locationSpan = document.getElementById("fire-location");
+
+        try {
+          // 위에서 만든 dummy 블루프린트의 API 호출
+          const response = await fetch("/dummy/check_fire");
+          const data = await response.json();
+
+          if (data.detected) {
+            alertDiv.style.display = "block";
+            locationSpan.innerText = "감지된 파일: " + data.video_name;
+
+            // 지도 중심을 화재 발생 예상 지역(예: 특정 마커)으로 이동시키거나
+            // 지도 테두리를 빨갛게 만드는 효과를 추가할 수 있습니다.
+          } else {
+            alertDiv.style.display = "none";
+          }
+        } catch (error) {
+          console.error("화재 모니터링 에러:", error);
+        }
+      }
+
+      // 1초마다 백엔드에 화재 여부를 물어봅니다.
+      setInterval(monitorFireStatus, 1000);
+
+      $(document).ready(function () {
+        // 페이지 로드 시 다크모드 상태 확인 및 즉시 적용
+        const isDarkMode = localStorage.getItem("darkMode") === "enabled";
+
+        if (isDarkMode) {
+          // body에 다크모드 클래스 추가
+          document.body.classList.add("dark-mode");
+
+          // ✅ 상태 패널도 즉시 다크모드 적용
+          const $statusPanel = $("#status-panel");
+          $statusPanel.css({
+            background: "#1a1a1a",
+            color: "#e9ecef",
+          });
+          $statusPanel
+            .find("h3, .legend-item, #last-update")
+            .css("color", "#e9ecef");
+          $statusPanel.find("span").css("color", "#e9ecef"); // ✅ span 태그도 추가
+        } else {
+          // ✅ 라이트모드일 때도 명시적으로 적용
+          const $statusPanel = $("#status-panel");
+          $statusPanel.css({
+            background: "rgba(255, 255, 255, 0.897)",
+            color: "#000000",
+          });
+          $statusPanel
+            .find("h3, .legend-item, #last-update")
+            .css("color", "#000000");
+          $statusPanel.find("span").css("color", "#000000"); // ✅ span 태그도 추가
+        }
+
+        // 지도 로딩 후 오버레이 업데이트
+        setTimeout(function () {
+          if (typeof window.updateMapOverlays === "function") {
+            window.updateMapOverlays(isDarkMode);
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>

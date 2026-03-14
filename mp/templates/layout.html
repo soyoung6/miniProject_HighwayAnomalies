@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ title if title else "관제 시스템" }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nanum+Gothic+Coding&family=Noto+Sans+KR:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main_bass.css') }}"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/header.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/sidebar.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/map_toggleBtn.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/footer.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/kakao_map.css') }}"
+    />
+
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/login_modal.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/cctv_analysis_modal.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/darkmode.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      {% include "partials/sidebar.html" %} {% include "partials/header.html" %}
+      {% include "partials/footer.html" %} {% if show_map_toggle_modal %} {%
+      include "modal/map_toggle_modal.html" %} {% endif %} {% if
+      if_show_kakao_map %} {% include "partials/kakao_map.html" %} {% endif %}
+      {% include "modal/login_modal.html" %} {% include
+      "modal/cctv_analysis_modal.html" %}
+
+      <main class="main">{% block content %}{% endblock %}</main>
+    </div>
+    <script>
+      const loginBtn = document.getElementById("login-open-btn");
+      const modalBg = document.getElementById("modal-bg");
+      const loginModal = document.getElementById("login-modal");
+
+      if (loginBtn && modalBg && loginModal) {
+        loginBtn.addEventListener("click", () => {
+          modalBg.classList.add("show");
+          loginModal.classList.add("show");
+        });
+
+        modalBg.addEventListener("click", () => {
+          modalBg.classList.remove("show");
+          loginModal.classList.remove("show");
+        });
+      }
+    </script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="{{ url_for('static', filename='js/darkmode.js') }}"></script>
+  </body>
+</html>

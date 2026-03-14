@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>맵 토글 버튼</title>
+  </head>
+  <body>
+    <div class="map_toggleBtn">
+      <div class="content">
+        <ul>
+          <li>테스트1</li>
+          <li>테스트2</li>
+        </ul>
+      </div>
+      <button class="toggle_button">펼치기</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        const $content = $(".map_toggleBtn .content");
+        const $button = $(".map_toggleBtn .toggle_button");
+        $content.hide();
+        $button.on("click", function () {
+          $content.slideToggle(300, function () {
+            if ($content.is(":visible")) {
+              $button.text("접기");
+            } else {
+              $button.text("펼치기");
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>

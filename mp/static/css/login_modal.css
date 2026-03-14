@@ -1,0 +1,128 @@
+h3 {
+  text-align: center;
+  font-size: 30px;
+  margin-bottom: 100px;
+  font-weight: bold;
+  color: #000000;
+}
+
+.modal-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backdrop-filter: blur(5px);
+  background: rgba(0, 0, 0, 0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s;
+  z-index: 10;
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.9);
+
+  background: #ffffff;
+  color: #000000;
+
+  padding: 100px;
+  border-radius: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: 0.3s;
+  z-index: 15;
+}
+
+.modal.show,
+.modal-bg.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal.show {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+form {
+  width: 100%;
+}
+
+.email_input input,
+.password_input input {
+  width: 100%;
+  border: none;
+  padding: 8px 0px;
+  box-shadow: 0 0 3px;
+  border-radius: 15px;
+  margin: 10px 0;
+  outline: none;
+
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.email_input input::placeholder,
+.password_input input::placeholder {
+  color: #000000;
+  opacity: 0.7;
+}
+
+.email_input input:hover,
+.password_input input:hover {
+  box-shadow: 0 0 5px #ffffff;
+  transition: 0.5s;
+}
+
+.email_input input:focus,
+.password_input input:focus {
+  box-shadow: 0 0 5px #ffffff;
+}
+
+/* 자동완성 스타일 */
+body.dark-mode .email_input input:-webkit-autofill,
+body.dark-mode .password_input input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1000px #343a40 inset !important;
+  -webkit-text-fill-color: #e9ecef !important;
+}
+
+.login_btn {
+  width: 100%;
+  display: flex;
+  justify-content: right;
+}
+
+.login_btn button {
+  border: none;
+  background-color: #0091ea;
+  box-shadow: 0 0 1px;
+  border-radius: 5px;
+  padding: 5px 30px;
+  margin: 5px 0;
+  cursor: pointer;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.login_btn button:hover {
+  box-shadow: 0 0 3px;
+  transition: 0.2s;
+  background-color: #007acc;
+}
+
+.modal_p a {
+  text-decoration: underline;
+}
+
+.modal_ps {
+  text-align: center;
+}
+
+.modal_ps a {
+  text-decoration: underline;
+}

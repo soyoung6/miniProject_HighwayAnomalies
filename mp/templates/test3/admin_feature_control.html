@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>테스트페이지3 - 기능 관리</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin_feature_control.css') }}"
+    />
+  </head>
+  <body>
+    {% extends "layout.html" %} {% block content %}
+    <div class="feature-control-container">
+      <div class="feature-control-header">
+        <h1>🛠️ 기능 관리</h1>
+        <p class="subtitle">각 기능을 활성화하거나 비활성화할 수 있습니다.</p>
+      </div>
+
+      <div class="quick-actions">
+        <button class="btn btn-enable-all" onclick="toggleAllFeatures(true)">
+          <i class="bx bx-check-circle"></i> 모두 활성화
+        </button>
+        <button class="btn btn-disable-all" onclick="toggleAllFeatures(false)">
+          <i class="bx bx-x-circle"></i> 모두 비활성화
+        </button>
+      </div>
+
+      <div class="feature-grid">
+        <!-- 화재 감지 -->
+        <div class="feature-card" data-feature="fire_detection">
+          <div class="feature-icon fire">🔥</div>
+          <div class="feature-info">
+            <h3>화재 감지</h3>
+            <p>화재 감지 테스트 기능을 제어합니다.</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              id="toggle-fire_detection"
+              {%
+              if
+              settings.fire_detection
+              %}checked{%
+              endif
+              %}
+              onchange="toggleFeature('fire_detection', this.checked)"
+            />
+            <span class="slider"></span>
+          </label>
+          <div class="feature-status">
+            <span
+              class="status-badge {% if settings.fire_detection %}enabled{% else %}disabled{% endif %}"
+            >
+              {% if settings.fire_detection %}활성화{% else %}비활성화{% endif
+              %}
+            </span>
+          </div>
+        </div>
+
+        <!-- 교통콘 감지 -->
+        <div class="feature-card" data-feature="cone_detection">
+          <div class="feature-icon cone">🚧</div>
+          <div class="feature-info">
+            <h3>교통콘 감지</h3>
+            <p>교통콘 감지 테스트 기능을 제어합니다.</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              id="toggle-cone_detection"
+              {%
+              if
+              settings.cone_detection
+              %}checked{%
+              endif
+              %}
+              onchange="toggleFeature('cone_detection', this.checked)"
+            />
+            <span class="slider"></span>
+          </label>
+          <div class="feature-status">
+            <span
+              class="status-badge {% if settings.cone_detection %}enabled{% else %}disabled{% endif %}"
+            >
+              {% if settings.cone_detection %}활성화{% else %}비활성화{% endif
+              %}
+            </span>
+          </div>
+        </div>
+
+        <!-- 주정차 감지 -->
+        <div class="feature-card" data-feature="parking_detection">
+          <div class="feature-icon parking">🚗</div>
+          <div class="feature-info">
+            <h3>주정차 감지</h3>
+            <p>불법 주정차 감지 테스트 기능을 제어합니다.</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              id="toggle-parking_detection"
+              {%
+              if
+              settings.parking_detection
+              %}checked{%
+              endif
+              %}
+              onchange="toggleFeature('parking_detection', this.checked)"
+            />
+            <span class="slider"></span>
+          </label>
+          <div class="feature-status">
+            <span
+              class="status-badge {% if settings.parking_detection %}enabled{% else %}disabled{% endif %}"
+            >
+              {% if settings.parking_detection %}활성화{% else %}비활성화{%
+              endif %}
+            </span>
+          </div>
+        </div>
+
+        <!-- CCTV 분석 -->
+        <div class="feature-card" data-feature="cctv_analysis">
+          <div class="feature-icon cctv">📹</div>
+          <div class="feature-info">
+            <h3>CCTV 분석</h3>
+            <p>CCTV 교통량 분석 모달 기능을 제어합니다.</p>
+          </div>
+          <label class="toggle-switch">
+            <input
+              type="checkbox"
+              id="toggle-cctv_analysis"
+              {%
+              if
+              settings.cctv_analysis
+              %}checked{%
+              endif
+              %}
+              onchange="toggleFeature('cctv_analysis', this.checked)"
+            />
+            <span class="slider"></span>
+          </label>
+          <div class="feature-status">
+            <span
+              class="status-badge {% if settings.cctv_analysis %}enabled{% else %}disabled{% endif %}"
+            >
+              {% if settings.cctv_analysis %}활성화{% else %}비활성화{% endif %}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="notification" id="notification"></div>
+    </div>
+
+    <script>
+      // 개별 기능 토글
+      async function toggleFeature(featureName, isEnabled) {
+        try {
+          const response = await fetch("/test3/api/features", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              feature_name: featureName,
+              is_enabled: isEnabled,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showNotification(data.message, "success");
+            updateCardStatus(featureName, isEnabled);
+          } else {
+            showNotification(data.message, "error");
+            // 실패시 토글 원복
+            document.getElementById(`toggle-${featureName}`).checked =
+              !isEnabled;
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showNotification("서버 오류가 발생했습니다.", "error");
+          document.getElementById(`toggle-${featureName}`).checked = !isEnabled;
+        }
+      }
+
+      // 모든 기능 일괄 토글
+      async function toggleAllFeatures(isEnabled) {
+        try {
+          const response = await fetch("/test3/api/features/all", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              is_enabled: isEnabled,
+            }),
+          });
+
+          const data = await response.json();
+
+          if (data.success) {
+            showNotification(data.message, "success");
+            // 모든 토글 업데이트
+            document.querySelectorAll(".feature-card").forEach((card) => {
+              const featureName = card.dataset.feature;
+              document.getElementById(`toggle-${featureName}`).checked =
+                isEnabled;
+              updateCardStatus(featureName, isEnabled);
+            });
+          } else {
+            showNotification(data.message, "error");
+          }
+        } catch (error) {
+          console.error("Error:", error);
+          showNotification("서버 오류가 발생했습니다.", "error");
+        }
+      }
+
+      // 카드 상태 UI 업데이트
+      function updateCardStatus(featureName, isEnabled) {
+        const card = document.querySelector(
+          `.feature-card[data-feature="${featureName}"]`
+        );
+        const badge = card.querySelector(".status-badge");
+
+        if (isEnabled) {
+          badge.textContent = "활성화";
+          badge.classList.remove("disabled");
+          badge.classList.add("enabled");
+        } else {
+          badge.textContent = "비활성화";
+          badge.classList.remove("enabled");
+          badge.classList.add("disabled");
+        }
+      }
+
+      // 알림 표시
+      function showNotification(message, type) {
+        const notification = document.getElementById("notification");
+        notification.textContent = message;
+        notification.className = `notification ${type} show`;
+
+        setTimeout(() => {
+          notification.classList.remove("show");
+        }, 3000);
+      }
+    </script>
+    {% endblock %}
+  </body>
+</html>

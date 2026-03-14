@@ -1,0 +1,64 @@
+<!-- templates/security/login_user.html -->
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/main_bass.css') }}"
+    />
+    <style>
+      .login_form {
+        height: 80vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        width: 100%;
+      }
+    </style>
+    <title>로그인</title>
+  </head>
+  <body>
+    {% extends "layout.html" %} {% block content %}
+    <div class="login_form">
+      <h2>로그인</h2>
+      <!-- 플래시 메시지 표시 -->
+      {% with messages = get_flashed_messages() %} {% if messages %}
+      <ul style="color: red">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+      </ul>
+      {% endif %} {% endwith %}
+      <form action="{{ url_for('security.login') }}" method="POST">
+        <ul>
+          <li>
+            <label for="email">이메일</label>
+            <input type="email" name="email" id="email" required />
+          </li>
+          <li>
+            <label for="password">비밀번호</label>
+            <input type="password" name="password" id="password" required />
+          </li>
+          <li>
+            <input type="checkbox" name="remember" id="remember" />
+            <label for="remember">로그인 상태 유지</label>
+          </li>
+        </ul>
+        <button type="submit">로그인</button>
+      </form>
+
+      <p>
+        아직 계정이 없나요?
+        <a href="{{ url_for('auth.register') }}">회원가입</a>
+      </p>
+      <p>
+        비밀번호를 잊으셨나요?
+        <a href="{{ url_for('security.forgot_password') }}">비밀번호 재설정</a>
+      </p>
+    </div>
+    {% endblock %}
+  </body>
+</html>

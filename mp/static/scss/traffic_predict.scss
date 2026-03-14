@@ -1,0 +1,509 @@
+@import "variables";
+
+/* Traffic Predict Page Styles */
+
+/* 메인 컨테이너 */
+.traffic-predict-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: $font-stack;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 헤더 섹션 */
+.predict-header {
+  text-align: center;
+
+  h1 {
+    font-size: 2rem;
+    color: $text-color;
+    margin-bottom: 30px;
+    font-weight: bolder;
+  }
+}
+
+/* 컨트롤 패널 */
+.control-panel-wrapper {
+  margin-bottom: 20px;
+}
+
+.control-panel {
+  background: $white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 0px 1px rgb(0, 0, 0);
+}
+
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.form-group {
+  flex: 1;
+  min-width: 200px;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+    color: $text-color;
+    font-size: 0.9rem;
+
+    i {
+      color: $primary-color;
+      margin-right: 5px;
+    }
+  }
+}
+
+.date-group {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex: 2;
+}
+
+.date-separator {
+  padding-bottom: 10px;
+  font-weight: bold;
+  color: #888;
+}
+
+.select-wrapper,
+input[type="datetime-local"] {
+  position: relative;
+  width: 100%;
+}
+
+select,
+input[type="datetime-local"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  color: $text-color;
+  background-color: $white;
+  transition: border-color 0.2s;
+  outline: none;
+
+  &:focus {
+    border-color: $primary-color;
+  }
+}
+
+/* 버튼 스타일 */
+.btn-predict {
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: $primary-color;
+  color: white;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    background-color: $primary-hover-color;
+  }
+
+  &:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+}
+
+/* 로딩 인디케이터 */
+.loading-container {
+  display: none;
+  text-align: center;
+  padding: 2rem;
+  background: $white;
+  border-radius: 8px;
+  margin-top: 2rem;
+  border: 1px solid #ddd;
+
+  &.active {
+    display: block;
+    animation: fadeIn 0.3s;
+  }
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #eee;
+  border-top: 4px solid $primary-color;
+  border-radius: 50%;
+  margin: 0 auto 1rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-content h3 {
+  margin-bottom: 0.5rem;
+  color: $text-color;
+}
+
+.loading-sub {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 0.5rem;
+}
+
+/* 결과 대시보드 */
+.results-dashboard {
+  display: none;
+  margin-top: 2rem;
+
+  &.active {
+    display: grid;
+    gap: 1.5rem;
+    animation: fadeIn 0.5s ease-out;
+  }
+}
+
+/* 통계 카드 */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.stat-card {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid #eee;
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  color: white;
+
+  &.mean {
+    background-color: $primary-color;
+  }
+  &.max {
+    background-color: #ef5350;
+  }
+  &.min {
+    background-color: #42a5f5;
+  }
+  &.count {
+    background-color: #66bb6a;
+  }
+}
+
+.stat-info {
+  h3 {
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.2rem;
+  }
+
+  .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: $text-color;
+  }
+
+  .unit {
+    font-size: 0.7rem;
+    color: #888;
+  }
+}
+
+/* 차트 섹션 */
+.chart-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+.section-header {
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+
+  h2 {
+    font-size: 1.2rem;
+    color: $text-color;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+.chart-wrapper {
+  height: 350px;
+  width: 100%;
+}
+
+/* 메트릭 박스 */
+.metrics-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+}
+
+.metrics-grid {
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.metric-item {
+  text-align: center;
+
+  .label {
+    display: block;
+    font-size: 0.8rem;
+    color: #666;
+    margin-bottom: 0.3rem;
+  }
+
+  .value {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: $primary-color;
+  }
+}
+
+/* 테이블 섹션 */
+.table-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid #eee;
+  overflow: hidden;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background-color: #f8f9fa;
+    color: #555;
+    padding: 0.8rem;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid #ddd;
+    font-size: 0.9rem;
+  }
+
+  td {
+    padding: 0.8rem;
+    color: $text-color;
+    vertical-align: middle;
+    font-size: 0.9rem;
+  }
+
+  tr:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+.traffic-value {
+  font-weight: bold;
+  color: $primary-color;
+}
+
+.weekday-badge {
+  background: #f1f3f5;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: #555;
+}
+
+/* 에러 메시지 */
+.error-container {
+  display: none;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: $error-bg;
+  border: 1px solid $error-border;
+  border-radius: 4px;
+  color: $error-text;
+  animation: fadeIn 0.3s;
+
+  &.active {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+/* ==========================================================================
+   다크 모드 지원
+   ========================================================================== */
+body.dark-mode {
+  .traffic-predict-container {
+    color: $dark-text;
+  }
+
+  .predict-header {
+    border-bottom-color: $dark-border;
+
+    h1 {
+      color: $dark-text;
+    }
+    p {
+      color: #adb5bd;
+    }
+  }
+
+  .control-panel,
+  .stat-card,
+  .chart-section,
+  .metrics-section,
+  .table-section,
+  .loading-container {
+    background: $dark-bg;
+    border-color: $dark-border;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  }
+
+  .form-group label {
+    color: $dark-text;
+  }
+
+  select,
+  input[type="datetime-local"] {
+    background-color: #333;
+    border-color: #555;
+    color: $dark-text;
+
+    &:focus {
+      border-color: $primary-color;
+    }
+  }
+
+  .date-separator {
+    color: #adb5bd;
+  }
+
+  .stat-info h3,
+  .metric-item .label {
+    color: #adb5bd;
+  }
+
+  .stat-info .value {
+    color: $dark-text;
+  }
+
+  .section-header {
+    border-bottom-color: $dark-border;
+
+    h2 {
+      color: $dark-text;
+    }
+  }
+
+  .modern-table {
+    th {
+      background-color: #333;
+      color: $dark-text;
+      border-bottom-color: #555;
+    }
+
+    td {
+      border-bottom-color: $dark-border;
+      color: $dark-text;
+    }
+
+    tr:hover {
+      background-color: #3a3a3a;
+    }
+  }
+
+  .weekday-badge {
+    background: $dark-border;
+    color: $dark-text;
+  }
+
+  .spinner {
+    border-color: $dark-border;
+    border-top-color: $primary-color;
+  }
+
+  .loading-content h3 {
+    color: $dark-text;
+  }
+}
+
+/* 모바일 반응형 */
+@media (max-width: 768px) {
+  .traffic-predict-container {
+    padding: 1rem;
+  }
+
+  .form-row {
+    gap: 1rem;
+  }
+
+  .date-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .date-separator {
+    display: none;
+  }
+
+  .predict-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+}

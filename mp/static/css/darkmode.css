@@ -1,0 +1,359 @@
+/* ===== 기본 body 스타일 ===== */
+#map {
+  color: #000000;
+}
+
+body {
+  background-color: #ffffff;
+  color: #000000;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* ===== 다크모드 body ===== */
+body.dark-mode {
+  background-color: #1a1a1a;
+  color: #e9ecef;
+}
+
+/* 다크모드에서 a 태그 색상 변경 */
+body.dark-mode a {
+  color: #e9ecef !important;
+}
+
+/* 버튼 스타일 a는 제외 */
+body.dark-mode a.button,
+body.dark-mode .btn {
+  color: inherit !important;
+}
+
+/* ===== 헤더 ===== */
+.header {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode .header {
+  background-color: #2d2d2d;
+}
+
+/* ===== 검색창 ===== */
+.search {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode .search {
+  background-color: #1a1a1a;
+}
+
+.search input {
+  background-color: #ffffff;
+  color: #000000;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .search input {
+  background-color: #1a1a1a;
+  color: #e9ecef;
+}
+
+.search input::placeholder {
+  color: #000000;
+  opacity: 0.8;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode .search input::placeholder {
+  color: #e9ecef;
+  opacity: 0.8;
+}
+
+.search-btn {
+  color: #000000;
+}
+
+body.dark-mode .search-btn {
+  color: #e9ecef;
+}
+
+/* ===== 푸터 ===== */
+.footer {
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode .footer {
+  background-color: #2d2d2d;
+}
+
+/* 푸터 날씨 위젯 */
+#weather-widget-footer,
+#weather-widget-footer * {
+  color: #000000;
+}
+
+body.dark-mode #weather-widget-footer,
+body.dark-mode #weather-widget-footer * {
+  color: #e9ecef !important;
+}
+
+/* ===== 로그인 모달 ===== */
+
+#login-modal {
+  background-color: #ffffff;
+  color: #000000;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#login-modal input {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #dee2e6;
+}
+
+#login-modal input::placeholder {
+  color: #666666;
+  opacity: 0.7;
+}
+
+#login-modal button {
+  background-color: #667eea;
+  color: #000000;
+}
+
+body.dark-mode #login-modal {
+  background-color: #1a1a1a;
+  color: #e9ecef;
+}
+
+body.dark-mode #login-modal h3 {
+  color: #e9ecef;
+}
+
+body.dark-mode #login-modal input {
+  background-color: #1a1a1a;
+  color: #e9ecef;
+  border: 1px solid #dee2e6;
+}
+
+body.dark-mode #login-modal input::placeholder {
+  color: #aaaaaa;
+  opacity: 0.7;
+}
+
+body.dark-mode #login-modal button {
+  background-color: #667eea;
+  color: #e9ecef;
+}
+
+/* ===== 사이드바 ===== */
+.sidebar {
+  background-color: #171f36;
+  color: white;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body.dark-mode .sidebar {
+  background-color: #2d2d2d;
+  color: #e9ecef;
+}
+
+.sidebar a {
+  color: white;
+}
+
+body.dark-mode .sidebar a {
+  color: #e9ecef;
+}
+
+.sidebar a:hover {
+  background-color: #f1f3f5;
+}
+
+body.dark-mode .sidebar a:hover {
+  background-color: #495057;
+}
+
+.sidebar .active {
+  background-color: #f1f3f5;
+}
+
+body.dark-mode .sidebar .active {
+  background-color: #495057;
+}
+
+/* ===== 사이드바 날씨 위젯 ===== */
+.weather-widget-sb {
+  background: #f5f5f5;
+  color: #333;
+}
+
+body.dark-mode .weather-widget-sb {
+  background: #1a1a1a;
+  color: #e9ecef;
+}
+
+body.dark-mode .weather-widget-sb * {
+  color: #e9ecef !important;
+}
+
+/* ===== 카카오맵 상태 패널 ===== */
+#status-panel {
+  background: rgba(255, 255, 255, 0.897);
+  color: #000000;
+}
+
+/* 각 요소별 텍스트 색상도 명시 */
+#status-panel h3,
+#status-panel .legend-item,
+#status-panel #last-update {
+  color: #000000;
+}
+
+body.dark-mode #status-panel {
+  background: #1a1a1a;
+  color: #e9ecef;
+}
+
+body.dark-mode #status-panel h3,
+body.dark-mode #status-panel .legend-item,
+body.dark-mode #status-panel #last-update {
+  color: #e9ecef;
+}
+
+/* ===== CCTV 모달 ===== */
+.cctv-widget {
+  background: white;
+  color: #000000;
+}
+
+body.dark-mode .cctv-widget {
+  background: #2d2d2d;
+  color: #e9ecef;
+}
+
+.cctv-widget-body {
+  background: white;
+}
+
+body.dark-mode .cctv-widget-body {
+  background: #2d2d2d;
+}
+
+.cctv-selector-label,
+.cctv-current-name {
+  color: #374151;
+}
+
+body.dark-mode .cctv-selector-label,
+body.dark-mode .cctv-current-name {
+  color: #e9ecef;
+}
+
+.cctv-selector {
+  background: white;
+  color: #1f2937;
+  border-color: #e5e7eb;
+}
+
+body.dark-mode .cctv-selector {
+  background: #2d2d2d;
+  color: #e9ecef;
+  border-color: #dee2e6;
+}
+
+/* ✅ 여기에 추가 */
+body.dark-mode .cctv-widget-video-wrapper {
+  border: 2px solid #2d2d2d;
+}
+
+/* ===== 다크모드 토글 버튼 ===== */
+.dark-mode-toggle {
+  background-color: #667eea;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 20px;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.dark-mode-toggle:hover {
+  background-color: #667eea;
+  transform: scale(1.05) rotate(15deg); /* ✅ 회전 효과 */
+}
+
+/* ===== 회원가입 페이지 ===== */
+.mainForm {
+  transition: all 0.3s ease;
+}
+
+.mainForm i {
+  color: #000000;
+}
+
+.mainForm input {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+
+.mainForm input::placeholder {
+  color: #000000;
+  opacity: 0.8;
+}
+
+.phoneForm select {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+body.dark-mode .mainForm i {
+  color: #e9ecef;
+}
+
+body.dark-mode .mainForm input {
+  background-color: #1a1a1a !important;
+  color: #e9ecef !important;
+}
+
+body.dark-mode .mainForm input::placeholder {
+  color: #aaaaaa;
+  opacity: 0.7;
+}
+
+body.dark-mode .phoneForm select {
+  background-color: #1a1a1a;
+  color: #e9ecef;
+}
+
+/* 다크모드 자동완성 스타일 */
+body.dark-mode .mainForm input:-webkit-autofill,
+body.dark-mode .mainForm input:-webkit-autofill:hover,
+body.dark-mode .mainForm input:-webkit-autofill:focus,
+body.dark-mode .mainForm input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1a1a1a inset !important;
+  -webkit-text-fill-color: #e9ecef !important;
+}
+
+/* 회원가입 폼 박스 스타일 */
+body.dark-mode .idForm,
+body.dark-mode .emailForm,
+body.dark-mode .pwForm,
+body.dark-mode .repwForm,
+body.dark-mode .nameForm,
+body.dark-mode .birthForm,
+body.dark-mode .phoneForm {
+  box-shadow: 0 0 1px #dee2e6;
+}
+
+body.dark-mode .phoneForm select,
+body.dark-mode .phoneForm input {
+  box-shadow: 0 0 1px #dee2e6;
+}

@@ -1,0 +1,46 @@
+.map_toggleBtn {
+  position: fixed;
+  left: 5px;
+  width: 300px;
+  background: #5555553b;
+  color: white;
+  border-radius: 8px;
+  cursor: default;
+  box-shadow: 0 0 5px black;
+  transition: 0.3s;
+  backdrop-filter: blur(30px);
+  overflow: hidden;
+  height: auto;
+  padding: 10px;
+  z-index: 100000;
+}
+
+.map_toggleBtn .content {
+  padding-bottom: 10px;
+}
+
+.map_toggleBtn button {
+  display: block;
+  width: 100%;
+  padding: 8px 0;
+  cursor: pointer;
+  background: #00000040;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  border-radius: 4px;
+  transition: 0.3s;
+}
+
+.map_toggleBtn button:hover {
+  background: #00000080;
+}
+
+.map_toggleBtn ul li {
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.map_toggleBtn ul li:hover {
+  color: aqua;
+}

@@ -1,0 +1,122 @@
+<!-- templates/auth/register.html -->
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/register.css') }}"
+    />
+    <title>회원가입</title>
+  </head>
+  <body>
+    {% extends "layout.html" %} {% block content %}
+    <h2>회원가입</h2>
+    {% with messages = get_flashed_messages() %} {% if messages %}
+    <ul>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %} {% endwith %}
+    <form
+      id="registerForm"
+      action="{{ url_for('auth.register') }}"
+      method="POST"
+    >
+      <div class="mainForm">
+        <div class="idForm">
+          <i class="bxr bx-user"></i>
+          <input type="text" name="name" placeholder="아이디" required />
+        </div>
+
+        <div class="pwForm">
+          <i class="bxr bx-lock-keyhole"></i>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="비밀번호"
+            required
+          />
+        </div>
+
+        <div class="repwForm">
+          <i class="bxr bx-lock"></i>
+          <input
+            type="password"
+            id="passwordConfirm"
+            name="password_confirm"
+            placeholder="비밀번호를 다시 입력하세요"
+            required
+          />
+          <p id="errorMsg" style="color: red; display: none">
+            비밀번호가 일치하지 않습니다.
+          </p>
+        </div>
+
+        <div class="emailForm">
+          <i class="bxr bx-envelope"></i>
+          <input
+            type="email"
+            name="email"
+            placeholder="이메일주소 (아이디 찾기 등 본인 확인용)"
+            required
+          />
+        </div>
+
+        <div class="nameForm">
+          <i class="bxr bx-user"></i>
+          <input type="text" name="name" placeholder="이름" required />
+        </div>
+
+        <div class="birthForm">
+          <i class="bxr bx-calendar"></i>
+          <input
+            type="date"
+            name="birth"
+            placeholder="생년월일 8자리"
+            required
+          />
+        </div>
+
+        <div class="phoneForm">
+          <i class="bxr bx-mobile-alt-2"></i>
+          <select name="mobile1" required>
+            <option value="010">010</option>
+            <option value="011">011</option>
+            <option value="016">016</option>
+          </select>
+          -
+          <input type="text" name="mobile2" maxlength="4" required />
+          -
+          <input type="text" name="mobile3" maxlength="4" required />
+        </div>
+
+        <div class="accessionButton"><button type="submit">가입</button></div>
+      </div>
+    </form>
+    {% endblock %}
+
+    <script>
+      const form = document.getElementById("registerForm");
+      const password = document.getElementById("password");
+      const passwordConfirm = document.getElementById("passwordConfirm");
+      const errorMsg = document.getElementById("errorMsg");
+
+      form.addEventListener("submit", function (event) {
+        if (password.value !== passwordConfirm.value) {
+          event.preventDefault();
+          errorMsg.style.display = "block";
+        } else {
+          errorMsg.style.display = "none";
+        }
+      });
+    </script>
+  </body>
+</html>
