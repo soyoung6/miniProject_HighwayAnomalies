@@ -3,7 +3,9 @@
 > **Flask 기반 실시간 CCTV 영상 분석 / 이상 상황 감지 / 교통량 예측 / 카카오맵 시각화 통합 플랫폼**
 
 ---
-
+## 시연 영상
+https://www.youtube.com/playlist?list=PLFvX6ZDAWK0XpmTk89g_MoCdo6KozRtwz
+---
 ## 📋 목차
 
 1. [프로젝트 개요](#1-프로젝트-개요)
